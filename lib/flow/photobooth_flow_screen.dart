@@ -5,7 +5,10 @@ import 'screens/idle_screen.dart';
 import 'screens/countdown_screen.dart';
 import 'screens/capture_screen.dart';
 import 'screens/processing_screen.dart';
+import 'screens/ask_another_screen.dart';
 import 'screens/result_screen.dart';
+import 'screens/photo_selection_share_screen.dart';
+import 'screens/photo_gallery_screen_share_2.dart';
 
 class PhotoboothFlowScreen extends StatefulWidget {
   const PhotoboothFlowScreen({super.key});
@@ -69,12 +72,43 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
       case PhotoboothState.processing:
         return ProcessingScreen(
           key: const ValueKey('processing'),
+          capturedImagePath: _flowState.capturedImagePath,
+        );
+      case PhotoboothState.askAnother:
+        return AskAnotherScreen(
+          key: const ValueKey('askAnother'),
+          capturedImagePath: _flowState.capturedImagePath,
+          onYes: _flowState.takeAnotherPhoto,
+          onNo: _flowState.showGallery,
         );
       case PhotoboothState.result:
         return ResultScreen(
           key: const ValueKey('result'),
           onReset: _flowState.resetToHome,
-          capturedImagePath: _flowState.capturedImagePath,
+          onDone: _flowState.handleDoneClick,
+          onDelete: _flowState.deletePhotos,
+          onShare: _flowState.startShareFlow,
+          showDoneToolbar: _flowState.showDoneToolbar,
+          capturedImages: _flowState.capturedImages,
+          currentGalleryIndex: _flowState.currentGalleryIndex,
+          onPrevious: _flowState.previousImage,
+          onNext: _flowState.nextImage,
+        );
+      case PhotoboothState.shareSelection:
+        return PhotoSelectionShareScreen(
+          key: const ValueKey('shareSelection'),
+          capturedImages: _flowState.capturedImages,
+          selectedImages: _flowState.selectedShareImages,
+          onToggleSelection: _flowState.toggleImageSelection,
+          onCancel: _flowState.cancelShareSelection,
+          onDone: _flowState.completeShareSelection,
+        );
+      case PhotoboothState.shareQr:
+        return PhotoGalleryScreenShare2(
+          key: const ValueKey('shareQr'),
+          countdownValue: _flowState.shareCountdownValue,
+          selectedImages: _flowState.selectedShareImages,
+          onDone: _flowState.resetToHome,
         );
     }
   }

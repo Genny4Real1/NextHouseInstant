@@ -32,7 +32,7 @@ class CountdownScreen extends StatelessWidget {
             children: [
               // Intestazione
               const Text(
-                'Preparati...',
+                'Get ready...',
                 style: AppTextStyles.header1,
               ),
               const SizedBox(height: AppSpacing.s16),
@@ -99,7 +99,7 @@ class CountdownScreen extends StatelessWidget {
 
               // Istruzione in basso
               const Text(
-                'Sorridi all\'obiettivo',
+                'Smile for the camera',
                 style: AppTextStyles.header2,
               ),
             ],

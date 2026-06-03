@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
-import '../../theme/app_text_styles.dart';
-import '../../widgets/kiosk_button.dart';
 
 class IdleScreen extends StatelessWidget {
   final VoidCallback onStart;
@@ -14,44 +11,61 @@ class IdleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.background,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.s64),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Icona superiore geometrica
-              const Icon(
-                Icons.camera_alt_outlined,
-                size: 80.0,
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(height: AppSpacing.s32),
-
-              // Titolo principale
-              const Text(
-                'Scatta una foto ricordo',
-                style: AppTextStyles.header1,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.s12),
-
-              // Sottotitolo
-              const Text(
-                'Il servizio è gratuito e richiede pochi secondi.',
-                style: AppTextStyles.header2,
-                textAlign: TextAlign.center,
+              // Logo Next House Copenhagen da Figma
+              Image.network(
+                'http://localhost:3845/assets/e9108d7c9f046f4af4488df44bec74f286ab1109.png',
+                height: 250.0,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback se il server locale non risponde
+                  return const Text(
+                    'Next House\nCOPENHAGEN',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 48.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      letterSpacing: 2.0,
+                    ),
+                    textAlign: TextAlign.center,
+                  );
+                },
               ),
               const SizedBox(height: AppSpacing.s48),
 
-              // Pulsante di avvio gigante
-              Center(
-                child: KioskButton(
-                  text: 'Tocca per iniziare',
-                  onPressed: onStart,
+              // Pulsante "TAKE A SELFIE" con gli angoli asimmetrici
+              GestureDetector(
+                onTap: onStart,
+                child: Container(
+                  width: 620.0,
+                  height: 140.0,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF4D5358), // NextHouse Black (Charcoal)
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(70.0),
+                      bottomLeft: Radius.circular(70.0),
+                      bottomRight: Radius.circular(70.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'TAKE A SELFIE',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 56.0,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 3.0,
+                    ),
+                  ),
                 ),
               ),
             ],

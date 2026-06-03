@@ -55,7 +55,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
               child: Column(
                 children: [
                   const Text(
-                    'Foto acquisita',
+                    'Photo captured',
                     style: AppTextStyles.header1,
                   ),
                   const SizedBox(height: AppSpacing.s16),
