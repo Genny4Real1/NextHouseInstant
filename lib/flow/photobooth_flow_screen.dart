@@ -93,6 +93,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           currentGalleryIndex: _flowState.currentGalleryIndex,
           onPrevious: _flowState.previousImage,
           onNext: _flowState.nextImage,
+          onPageChanged: _flowState.setGalleryIndex,
         );
       case PhotoboothState.shareSelection:
         return PhotoSelectionShareScreen(

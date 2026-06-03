@@ -4,7 +4,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/camera_placeholder.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final VoidCallback onReset;
   final VoidCallback onDone;
   final VoidCallback onDelete;
@@ -14,6 +14,7 @@ class ResultScreen extends StatelessWidget {
   final int currentGalleryIndex;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
+  final ValueChanged<int> onPageChanged;
 
   const ResultScreen({
     super.key,
@@ -26,12 +27,48 @@ class ResultScreen extends StatelessWidget {
     required this.currentGalleryIndex,
     required this.onPrevious,
     required this.onNext,
+    required this.onPageChanged,
   });
 
   @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      initialPage: widget.currentGalleryIndex,
+      viewportFraction: 0.65,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(ResultScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Sincronizza il controller se l'indice esterno cambia (es. tramite frecce)
+    if (widget.currentGalleryIndex != oldWidget.currentGalleryIndex &&
+        widget.currentGalleryIndex != _pageController.page?.round()) {
+      _pageController.animateToPage(
+        widget.currentGalleryIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bool hasImages = capturedImages.isNotEmpty;
-    final String currentImagePath = hasImages ? capturedImages[currentGalleryIndex] : '';
+    final bool hasImages = widget.capturedImages.isNotEmpty;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -44,7 +81,7 @@ class ResultScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: AppSpacing.s24),
                 // Indicatore contatore foto in alto (es. 2 / 3)
-                if (hasImages && capturedImages.length > 1)
+                if (hasImages && widget.capturedImages.length > 1)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.s16,
@@ -55,7 +92,7 @@ class ResultScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     child: Text(
-                      '${currentGalleryIndex + 1} / ${capturedImages.length}',
+                      '${widget.currentGalleryIndex + 1} / ${widget.capturedImages.length}',
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         color: Colors.white,
@@ -66,65 +103,69 @@ class ResultScreen extends StatelessWidget {
                   ),
                 const SizedBox(height: AppSpacing.s16),
 
-                // Contenitore della foto
+                // Contenitore della foto (Carousel con PageView)
                 Expanded(
                   child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s64),
-                      child: AspectRatio(
-                        aspectRatio: 4 / 3,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(24.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(127),
-                                blurRadius: 25.0,
-                                spreadRadius: 2.0,
-                              ),
-                            ],
-                          ),
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onHorizontalDragEnd: (details) {
-                              if (!showDoneToolbar) return; // Disabilita lo scorrimento prima di premere Done
-                              if (details.primaryVelocity == null) return;
-                              if (details.primaryVelocity! > 0) {
-                                // Trascina verso destra -> foto precedente
-                                onPrevious();
-                              } else if (details.primaryVelocity! < 0) {
-                                // Trascina verso sinistra -> foto successiva
-                                onNext();
-                              }
-                            },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(24.0),
-                              child: hasImages
-                                  ? AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 250),
-                                      transitionBuilder: (child, animation) {
-                                        return FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        );
-                                      },
-                                      child: Image.file(
-                                        File(currentImagePath),
-                                        key: ValueKey<int>(currentGalleryIndex),
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        errorBuilder: (context, error, stackTrace) =>
-                                            const CameraPlaceholder(showGuides: false),
+                    child: hasImages
+                        ? PageView.builder(
+                            controller: _pageController,
+                            itemCount: widget.capturedImages.length,
+                            onPageChanged: widget.onPageChanged,
+                            physics: widget.showDoneToolbar
+                                ? const BouncingScrollPhysics()
+                                : const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final String path = widget.capturedImages[index];
+
+                              return AnimatedBuilder(
+                                animation: _pageController,
+                                builder: (context, child) {
+                                  double scale = 1.0;
+                                  if (_pageController.position.haveDimensions) {
+                                    double page = _pageController.page ?? widget.currentGalleryIndex.toDouble();
+                                    double diff = page - index;
+                                    scale = (1 - (diff.abs() * 0.15)).clamp(0.8, 1.0);
+                                  } else {
+                                    scale = index == widget.currentGalleryIndex ? 1.0 : 0.85;
+                                  }
+
+                                  return Center(
+                                    child: Transform.scale(
+                                      scale: scale,
+                                      child: AspectRatio(
+                                        aspectRatio: 4 / 3,
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.surface,
+                                            borderRadius: BorderRadius.circular(24.0),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withAlpha(127),
+                                                blurRadius: 15.0,
+                                                spreadRadius: 1.0,
+                                                offset: const Offset(0.0, 6.0),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(24.0),
+                                            child: Image.file(
+                                              File(path),
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  const CameraPlaceholder(showGuides: false),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    )
-                                  : const CameraPlaceholder(showGuides: false),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        : const CameraPlaceholder(showGuides: false),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.s32),
@@ -132,7 +173,7 @@ class ResultScreen extends StatelessWidget {
                 // Sezione inferiore animata (Pulsante Done vs. Toolbar con pulsanti disabilitati)
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  child: !showDoneToolbar
+                  child: !widget.showDoneToolbar
                       ? Center(
                           key: const ValueKey('done_button_view'),
                           child: SizedBox(
@@ -147,7 +188,7 @@ class ResultScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(28.0),
                                 ),
                               ),
-                              onPressed: onDone,
+                              onPressed: widget.onDone,
                               child: const Text(
                                 'Done',
                                 style: TextStyle(
@@ -174,13 +215,13 @@ class ResultScreen extends StatelessWidget {
                               _buildActiveToolbarButton(
                                 icon: Icons.ios_share_rounded,
                                 label: 'Share',
-                                onPressed: onShare,
+                                onPressed: widget.onShare,
                                 iconColor: AppColors.primary,
                               ),
                               _buildActiveToolbarButton(
                                 icon: Icons.delete_outline_rounded,
                                 label: 'Delete',
-                                onPressed: onDelete,
+                                onPressed: widget.onDelete,
                                 iconColor: AppColors.error,
                               ),
                               _buildDisabledToolbarButton(
@@ -196,7 +237,7 @@ class ResultScreen extends StatelessWidget {
             ),
 
             // Pulsante Freccia Sinistra (Precedente)
-            if (showDoneToolbar && hasImages && capturedImages.length > 1)
+            if (widget.showDoneToolbar && hasImages && widget.capturedImages.length > 1)
               Positioned(
                 left: 24.0,
                 child: Container(
@@ -210,13 +251,13 @@ class ResultScreen extends StatelessWidget {
                       Icons.chevron_left_rounded,
                       color: Colors.white,
                     ),
-                    onPressed: onPrevious,
+                    onPressed: widget.onPrevious,
                   ),
                 ),
               ),
 
             // Pulsante Freccia Destra (Successiva)
-            if (showDoneToolbar && hasImages && capturedImages.length > 1)
+            if (widget.showDoneToolbar && hasImages && widget.capturedImages.length > 1)
               Positioned(
                 right: 24.0,
                 child: Container(
@@ -230,7 +271,7 @@ class ResultScreen extends StatelessWidget {
                       Icons.chevron_right_rounded,
                       color: Colors.white,
                     ),
-                    onPressed: onNext,
+                    onPressed: widget.onNext,
                   ),
                 ),
               ),
@@ -250,7 +291,7 @@ class ResultScreen extends StatelessWidget {
                     Icons.close_rounded,
                     color: Colors.white,
                   ),
-                  onPressed: onReset,
+                  onPressed: widget.onReset,
                 ),
               ),
             ),

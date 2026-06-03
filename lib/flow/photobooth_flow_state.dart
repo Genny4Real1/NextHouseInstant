@@ -152,10 +152,23 @@ class PhotoboothFlowState extends ChangeNotifier {
     _cancelTimers();
     _state = PhotoboothState.result;
     _currentGalleryIndex = _capturedImages.isNotEmpty ? _capturedImages.length - 1 : 0;
-    _showDoneToolbar = false;
+    _showDoneToolbar = true;
     notifyListeners();
 
     // Avvia il timer di auto-reset per inattività nella galleria
+    _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
+      resetToHome();
+    });
+  }
+
+  // Imposta l'indice corrente della galleria direttamente
+  void setGalleryIndex(int index) {
+    if (_capturedImages.isEmpty) return;
+    if (index < 0 || index >= _capturedImages.length) return;
+    _cancelTimers();
+    _currentGalleryIndex = index;
+    notifyListeners();
+
     _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
       resetToHome();
     });
@@ -218,21 +231,42 @@ class PhotoboothFlowState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Cancella fisicamente le foto scattate in questa sessione e torna alla home
+  // Cancella fisicamente solo la foto corrente e aggiorna la galleria
   Future<void> deletePhotos() async {
+    if (_capturedImages.isEmpty) return;
     _cancelTimers();
-    // Elimina fisicamente i file per liberare spazio e garantire la privacy
-    for (final path in _capturedImages) {
-      try {
-        final file = File(path);
-        if (await file.exists()) {
-          await file.delete();
-        }
-      } catch (e) {
-        debugPrint('Errore durante la cancellazione del file $path: $e');
+
+    final String pathToDelete = _capturedImages[_currentGalleryIndex];
+
+    // Elimina fisicamente il file per liberare spazio e garantire la privacy
+    try {
+      final file = File(pathToDelete);
+      if (await file.exists()) {
+        await file.delete();
       }
+    } catch (e) {
+      debugPrint('Errore durante la cancellazione del file $pathToDelete: $e');
     }
-    resetToHome();
+
+    // Rimuove la foto dalle liste interne
+    _capturedImages.removeAt(_currentGalleryIndex);
+    _selectedShareImages.remove(pathToDelete);
+
+    if (_capturedImages.isEmpty) {
+      // Se non ci sono più foto, torna alla home
+      resetToHome();
+    } else {
+      // Regola l'indice per rimanere nei limiti
+      if (_currentGalleryIndex >= _capturedImages.length) {
+        _currentGalleryIndex = _capturedImages.length - 1;
+      }
+      notifyListeners();
+
+      // Riavvia il timer di auto-reset per inattività
+      _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
+        resetToHome();
+      });
+    }
   }
 
   // Inizia il flusso di condivisione
