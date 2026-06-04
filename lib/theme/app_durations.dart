@@ -20,4 +20,16 @@ class AppDurations {
 
   // Figma: NextHouse_SpinningWheel (74:74) - un giro completo ogni 2s
   static const Duration processingRotation = Duration(seconds: 2);
+
+  // Figma: flash frame (57:209) - 150ms overlay
+  static const Duration countdownFlash = Duration(milliseconds: 150);
+
+  // Figma: end frame (57:217) - 250ms hold before processing
+  static const Duration captureEndHold = Duration(milliseconds: 250);
+
+  // Figma: share uploading view (48:123) - 2s mock upload
+  static const Duration shareUploading = Duration(seconds: 2);
+
+  // Share QR auto-reset - bumped from 30s to 60s (UI shows only a thin progress bar, not a number)
+  static const Duration shareQrAutoReset = Duration(seconds: 60);
 }
