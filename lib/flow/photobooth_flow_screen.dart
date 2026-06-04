@@ -4,11 +4,14 @@ import '../theme/app_durations.dart';
 import 'screens/idle_screen.dart';
 import 'screens/countdown_screen.dart';
 import 'screens/capture_screen.dart';
+import 'screens/capture_end_screen.dart';
 import 'screens/processing_screen.dart';
 import 'screens/ask_another_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/photo_selection_share_screen.dart';
 import 'screens/photo_gallery_screen_share_2.dart';
+import 'screens/share_confirm_screen.dart';
+import 'screens/share_uploading_screen.dart';
 
 class PhotoboothFlowScreen extends StatefulWidget {
   const PhotoboothFlowScreen({super.key});
@@ -62,7 +65,12 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
         return CountdownScreen(
           key: const ValueKey('countdown'),
           countdownValue: _flowState.countdownValue,
+          introActive: _flowState.introActive,
           cameraController: _flowState.cameraController,
+        );
+      case PhotoboothState.captureEnd:
+        return CaptureEndScreen(
+          key: const ValueKey('captureEnd'),
         );
       case PhotoboothState.captureFeedback:
         return CaptureScreen(
@@ -102,7 +110,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           selectedImages: _flowState.selectedShareImages,
           onToggleSelection: _flowState.toggleImageSelection,
           onCancel: _flowState.cancelShareSelection,
-          onDone: _flowState.completeShareSelection,
+          onDone: _flowState.confirmShareSelection,
         );
       case PhotoboothState.shareQr:
         return PhotoGalleryScreenShare2(
@@ -110,6 +118,17 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           countdownValue: _flowState.shareCountdownValue,
           selectedImages: _flowState.selectedShareImages,
           onDone: _flowState.resetToHome,
+        );
+      case PhotoboothState.shareConfirm:
+        return ShareConfirmScreen(
+          key: const ValueKey('shareConfirm'),
+          onYes: _flowState.proceedShareUpload,
+          onNo: _flowState.cancelShareConfirm,
+        );
+      case PhotoboothState.shareUploading:
+        return ShareUploadingScreen(
+          key: const ValueKey('shareUploading'),
+          capturedImages: _flowState.capturedImages,
         );
     }
   }

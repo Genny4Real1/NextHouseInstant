@@ -41,6 +41,8 @@ class PhotoboothFlowState extends ChangeNotifier {
 
   PhotoboothState get state => _state;
   int get countdownValue => _countdownValue;
+  bool _introActive = false;
+  bool get introActive => _introActive;
   CameraController? get cameraController => _cameraController;
   bool get isCameraInitialized => _isCameraInitialized;
   String? get capturedImagePath => _capturedImagePath;
@@ -91,9 +93,11 @@ class PhotoboothFlowState extends ChangeNotifier {
     _cancelTimers();
     _state = PhotoboothState.countdown;
     _countdownValue = AppDurations.countdownStart;
+    _introActive = true;
     notifyListeners();
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _introActive = false;
       if (_countdownValue > 1) {
         _countdownValue--;
         notifyListeners();
@@ -157,9 +161,11 @@ class PhotoboothFlowState extends ChangeNotifier {
     _cancelTimers();
     _state = PhotoboothState.countdown;
     _countdownValue = AppDurations.countdownStart;
+    _introActive = true;
     notifyListeners();
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _introActive = false;
       if (_countdownValue > 1) {
         _countdownValue--;
         notifyListeners();
@@ -251,6 +257,7 @@ class PhotoboothFlowState extends ChangeNotifier {
     _selectedShareImages.clear();
     _shareCountdownValue = 30;
     _shareQrDeadline = null;
+    _introActive = false;
     notifyListeners();
   }
 

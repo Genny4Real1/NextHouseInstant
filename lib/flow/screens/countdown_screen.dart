@@ -1,111 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
 import '../../theme/app_text_styles.dart';
-import '../../widgets/camera_placeholder.dart';
-import '../../widgets/kiosk_container.dart';
+import '../../widgets/onboarding_overlay.dart';
+import '../../widgets/record_button.dart';
 
-class CountdownScreen extends StatelessWidget {
+/// Figma 29-4, 33-15, 53-85..112, 57-209, 131-144.
+/// Full-bleed camera preview with phased overlays:
+///   - intro 0.0-0.8s: "Say..." top-left (suspense, Figma 131-144)
+///   - t=5,4: "I love hostels!" top-left + number bottom-center
+///   - t=3,2,1: number only
+///   - flash: full-screen white overlay (handled by CaptureScreen, not here)
+class CountdownScreen extends StatefulWidget {
   final int countdownValue;
+  final bool introActive;
   final CameraController? cameraController;
+  final VoidCallback? onDismissOnboarding;
 
   const CountdownScreen({
     super.key,
     required this.countdownValue,
+    required this.introActive,
     this.cameraController,
+    this.onDismissOnboarding,
   });
 
   @override
+  State<CountdownScreen> createState() => _CountdownScreenState();
+}
+
+class _CountdownScreenState extends State<CountdownScreen> {
+  bool _showOnboarding = true;
+
+  bool get _isCameraActive =>
+      widget.cameraController != null && widget.cameraController!.value.isInitialized;
+
+  bool get _showTextOverlay =>
+      widget.introActive || widget.countdownValue >= 4;
+
+  bool get _showNumberOverlay =>
+      !widget.introActive && widget.countdownValue >= 1 && widget.countdownValue <= 5;
+
+  @override
   Widget build(BuildContext context) {
-    final bool isCameraActive = cameraController != null && cameraController!.value.isInitialized;
-
-    return Container(
-      color: AppColors.background,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppSpacing.s24,
-            horizontal: AppSpacing.s64,
-          ),
-          child: Column(
-            children: [
-              // Intestazione
-              const Text(
-                'Get ready...',
-                style: AppTextStyles.header1,
-              ),
-              const SizedBox(height: AppSpacing.s16),
-
-              // Contenitore inquadratura con numero countdown sovrapposto
-              Expanded(
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 4 / 3,
-                    child: KioskContainer(
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Feed reale della camera (se attiva) oppure Placeholder di fallback
-                          Positioned.fill(
-                            child: isCameraActive
-                                ? CameraPreview(cameraController!)
-                                : const CameraPlaceholder(showGuides: false),
-                          ),
-
-                          // Silhouette stilizzata e guide disegnate sopra (senza sfondo coprente)
-                          const Positioned.fill(
-                            child: CameraPlaceholder(
-                              showGuides: true,
-                              showBackground: false,
-                            ),
-                          ),
-
-                          // Leggera sfumatura scura per aumentare il contrasto del numero
-                          Container(
-                            color: const Color(0x26000000),
-                          ),
-
-                          // Numero countdown gigante animato ad ogni secondo
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 250),
-                            transitionBuilder: (child, animation) {
-                              return ScaleTransition(
-                                scale: Tween<double>(begin: 0.7, end: 1.0).animate(
-                                  CurvedAnimation(
-                                    parent: animation,
-                                    curve: Curves.easeOutBack,
-                                  ),
-                                ),
-                                child: FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: Text(
-                              '$countdownValue',
-                              key: ValueKey<int>(countdownValue),
-                              style: AppTextStyles.countdownDisplay,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+    return Stack(
+      children: <Widget>[
+        // 1. Camera preview (full-bleed) or fallback
+        Positioned.fill(
+          child: ColoredBox(
+            color: Colors.black,
+            child: _isCameraActive
+                ? CameraPreview(widget.cameraController!)
+                : Image.asset(
+                    'assets/images/processing_bg_sample.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) =>
+                        const ColoredBox(color: Colors.black),
                   ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.s16),
-
-              // Istruzione in basso
-              const Text(
-                'Smile for the camera',
-                style: AppTextStyles.header2,
-              ),
-            ],
           ),
         ),
-      ),
+
+        // 2. Top-left text overlay
+        if (_showTextOverlay)
+          Positioned(
+            left: 293.5,
+            top: 112.0,
+            width: 693.0,
+            child: Text(
+              widget.introActive ? 'Say...' : 'I love hostels!',
+              style: AppTextStyles.countdownTitle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+        // 3. Centered number overlay
+        if (_showNumberOverlay)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 342.0,
+            child: Center(
+              child: Text(
+                '${widget.countdownValue}',
+                style: AppTextStyles.countdownNumber,
+              ),
+            ),
+          ),
+
+        // 4. Decorative record button (Figma 29-4, 135:139)
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: const Center(
+            child: Padding(
+              padding: EdgeInsets.only(right: 7.0),
+              child: RecordButton(),
+            ),
+          ),
+        ),
+
+        // 5. Onboarding overlay (first camera screen)
+        if (_showOnboarding && widget.onDismissOnboarding != null)
+          OnboardingOverlay(
+            message: 'Get ready! Your photo will be taken in a few seconds.',
+            onDismiss: () {
+              setState(() => _showOnboarding = false);
+              widget.onDismissOnboarding?.call();
+            },
+          ),
+      ],
     );
   }
 }
+
