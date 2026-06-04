@@ -1,10 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
+import '../../theme/app_text_styles.dart';
 import '../../widgets/camera_placeholder.dart';
+import '../../widgets/kiosk_button.dart';
+import '../../widgets/thumbnail_checkmark.dart';
 
-class PhotoSelectionShareScreen extends StatelessWidget {
+/// Figma 74-91 - 4x3 grid of photo thumbnails. Row 1 shows captured photos;
+/// rows 2-4 are empty placeholders. Last cell of row 4 = orange "Done" pill.
+class PhotoSelectionShareScreen extends StatefulWidget {
   final List<String> capturedImages;
   final Set<String> selectedImages;
   final Function(String) onToggleSelection;
@@ -21,186 +25,78 @@ class PhotoSelectionShareScreen extends StatelessWidget {
   });
 
   @override
+  State<PhotoSelectionShareScreen> createState() =>
+      _PhotoSelectionShareScreenState();
+}
+
+class _PhotoSelectionShareScreenState extends State<PhotoSelectionShareScreen> {
+  static const int _columns = 4;
+  static const int _rows = 3;
+  static const double _cellSize = 288.5;
+  static const double _cellGap = 4.0;
+  static const double _gridLeft = 48.0;
+  static const double _gridTop = 48.0;
+
+  @override
   Widget build(BuildContext context) {
-    final bool hasSelection = selectedImages.isNotEmpty;
+    final bool hasSelection = widget.selectedImages.isNotEmpty;
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Stack(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: AppSpacing.s24),
-                // Titolo della pagina
-                const Text(
-                  'Condividi le tue foto',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    color: Colors.white,
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+            // Small English title (D10)
+            const Positioned(
+              top: 8.0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                child: Text(
+                  'Select your photos to share',
+                  style: AppTextStyles.header1,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 4.0),
-                const Text(
-                  'Seleziona le immagini che desideri salvare',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    color: AppColors.textSecondary,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.s24),
-
-                // Lista orizzontale di foto
-                Expanded(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 280.0),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s48),
-                        itemCount: capturedImages.length,
-                        itemBuilder: (context, index) {
-                          final String path = capturedImages[index];
-                          final bool isSelected = selectedImages.contains(path);
-
-                          return GestureDetector(
-                            onTap: () => onToggleSelection(path),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s12),
-                              width: 320.0,
-                              decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(24.0),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.primary
-                                      : Colors.white.withAlpha(20),
-                                  width: 3.0,
-                                ),
-                                boxShadow: [
-                                  if (isSelected)
-                                    BoxShadow(
-                                      color: AppColors.primary.withAlpha(50),
-                                      blurRadius: 15.0,
-                                      spreadRadius: 1.0,
-                                    )
-                                  else
-                                    BoxShadow(
-                                      color: Colors.black.withAlpha(50),
-                                      blurRadius: 10.0,
-                                    ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(21.0),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    // La Foto
-                                    Image.file(
-                                      File(path),
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          const CameraPlaceholder(showGuides: false),
-                                    ),
-                                    // Overlay oscurante se non selezionata
-                                    AnimatedOpacity(
-                                      opacity: isSelected ? 0.0 : 0.4,
-                                      duration: const Duration(milliseconds: 200),
-                                      child: Container(
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    // Indicatore di selezione (Checkmark) in alto a destra
-                                    Positioned(
-                                      top: 16.0,
-                                      right: 16.0,
-                                      child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 200),
-                                        padding: const EdgeInsets.all(4.0),
-                                        decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? AppColors.primary
-                                              : Colors.black.withAlpha(100),
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons.check_rounded,
-                                          size: 24.0,
-                                          color: isSelected ? Colors.black : Colors.transparent,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.s32),
-
-                // Barra dei pulsanti inferiore
-                Center(
-                  child: SizedBox(
-                    width: 200.0,
-                    height: 56.0,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: hasSelection ? Colors.white : Colors.white.withAlpha(50),
-                        elevation: hasSelection ? 4.0 : 0.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28.0),
-                        ),
-                      ),
-                      onPressed: hasSelection ? onDone : null,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Condividi',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: hasSelection ? Colors.black : Colors.white.withAlpha(80),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.s8),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            color: hasSelection ? Colors.black : Colors.white.withAlpha(80),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.s24),
-              ],
+              ),
             ),
 
-            // Pulsante Chiudi/Annulla in alto a destra
+            // 4x3 grid
             Positioned(
-              top: 20.0,
-              right: 20.0,
+              left: _gridLeft,
+              top: _gridTop,
+              child: Column(
+                children: List<Widget>.generate(_rows, (row) {
+                  final List<Widget> cells = <Widget>[];
+                  for (int col = 0; col < _columns; col++) {
+                    if (col > 0) {
+                      cells.add(const SizedBox(width: _cellGap));
+                    }
+                    final int index = row * _columns + col;
+                    final bool isDoneCell =
+                        row == _rows - 1 && col == _columns - 1;
+                    if (isDoneCell) {
+                      cells.add(_buildDoneCell(hasSelection: hasSelection));
+                    } else if (index < widget.capturedImages.length) {
+                      cells.add(_buildPhotoCell(widget.capturedImages[index]));
+                    } else {
+                      cells.add(_buildEmptyCell());
+                    }
+                  }
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: row < _rows - 1 ? _cellGap : 0,
+                    ),
+                    child: Row(children: cells),
+                  );
+                }),
+              ),
+            ),
+
+            // Top-right close
+            Positioned(
+              top: 16.0,
+              right: 16.0,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(20),
@@ -208,15 +104,80 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                 ),
                 child: IconButton(
                   iconSize: 28.0,
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: Colors.white,
-                  ),
-                  onPressed: onCancel,
+                  icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  onPressed: widget.onCancel,
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhotoCell(String path) {
+    final bool isSelected = widget.selectedImages.contains(path);
+    final File file = File(path);
+
+    return GestureDetector(
+      onTap: () => widget.onToggleSelection(path),
+      child: SizedBox(
+        width: _cellSize,
+        height: _cellSize / 1.71, // 4:3 ratio -> 288.5 x ~168.5
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (file.existsSync())
+              Image.file(file, fit: BoxFit.cover, gaplessPlayback: true)
+            else
+              const CameraPlaceholder(showGuides: false),
+            // Bottom-right checkmark pill
+            Positioned(
+              right: 8.0,
+              bottom: 8.0,
+              child: ThumbnailCheckmark(
+                isSelected: isSelected,
+                onTap: () => widget.onToggleSelection(path),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyCell() {
+    return Container(
+      width: _cellSize,
+      height: _cellSize / 1.71,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.image_outlined,
+          color: Colors.white24,
+          size: 48.0,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDoneCell({required bool hasSelection}) {
+    return SizedBox(
+      width: _cellSize,
+      height: _cellSize / 1.71,
+      child: Center(
+        child: KioskButton(
+          text: 'Done',
+          onPressed: hasSelection ? widget.onDone : () {},
+          backgroundColor: AppColors.nextHouseOrange,
+          textColor: Colors.white,
+          width: 240.0,
+          height: 100.0,
+          borderRadius: BorderRadius.circular(50.0),
+          textStyle: AppTextStyles.donePill,
         ),
       ),
     );
