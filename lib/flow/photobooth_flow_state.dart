@@ -7,11 +7,14 @@ import '../theme/app_durations.dart';
 enum PhotoboothState {
   idle,
   countdown,
+  captureEnd,
   captureFeedback,
   processing,
   askAnother,
   result,
   shareSelection,
+  shareConfirm,
+  shareUploading,
   shareQr,
 }
 
@@ -21,6 +24,9 @@ class PhotoboothFlowState extends ChangeNotifier {
   Timer? _countdownTimer;
   Timer? _autoResetTimer;
   Timer? _shareTimer;
+  Timer? _captureEndTimer;
+  Timer? _shareUploadingTimer;
+  DateTime? _shareQrDeadline;
 
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
@@ -43,6 +49,14 @@ class PhotoboothFlowState extends ChangeNotifier {
   bool get showDoneToolbar => _showDoneToolbar;
   Set<String> get selectedShareImages => _selectedShareImages;
   int get shareCountdownValue => _shareCountdownValue;
+
+  double get shareQrProgress {
+    if (_shareQrDeadline == null) return 0.0;
+    final Duration remaining = _shareQrDeadline!.difference(DateTime.now());
+    if (remaining.isNegative) return 0.0;
+    return remaining.inMilliseconds /
+        AppDurations.shareQrAutoReset.inMilliseconds;
+  }
 
   // Inizializza la fotocamera (preferendo la camera frontale per il photobooth)
   Future<void> initializeCamera() async {
@@ -85,13 +99,12 @@ class PhotoboothFlowState extends ChangeNotifier {
         notifyListeners();
       } else {
         timer.cancel();
-        _triggerCapture();
+        _triggerFlashAndCapture();
       }
     });
   }
 
-  // Scatto ed acquisizione feedback reale
-  Future<void> _triggerCapture() async {
+  Future<void> _triggerFlashAndCapture() async {
     _cancelTimers();
     _state = PhotoboothState.captureFeedback;
     notifyListeners();
@@ -107,7 +120,17 @@ class PhotoboothFlowState extends ChangeNotifier {
       }
     }
 
-    _autoResetTimer = Timer(AppDurations.captureFeedback, () {
+    Timer(AppDurations.countdownFlash, () {
+      _startCaptureEnd();
+    });
+  }
+
+  void _startCaptureEnd() {
+    _cancelTimers();
+    _state = PhotoboothState.captureEnd;
+    notifyListeners();
+
+    _captureEndTimer = Timer(AppDurations.captureEndHold, () {
       _startProcessing();
     });
   }
@@ -142,7 +165,7 @@ class PhotoboothFlowState extends ChangeNotifier {
         notifyListeners();
       } else {
         timer.cancel();
-        _triggerCapture();
+        _triggerFlashAndCapture();
       }
     });
   }
@@ -206,13 +229,12 @@ class PhotoboothFlowState extends ChangeNotifier {
     });
   }
 
-  // Gestisce il click sul pulsante Fine nella galleria: mostra i pulsanti toolbar disabilitati
+  // Gestisce il click sul pulsante Fine nella galleria
   void handleDoneClick() {
     _cancelTimers();
     _showDoneToolbar = true;
     notifyListeners();
 
-    // Riavvia il timer di auto-reset di inattività da 1 minuto
     _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
       resetToHome();
     });
@@ -228,6 +250,7 @@ class PhotoboothFlowState extends ChangeNotifier {
     _showDoneToolbar = false;
     _selectedShareImages.clear();
     _shareCountdownValue = 30;
+    _shareQrDeadline = null;
     notifyListeners();
   }
 
@@ -238,7 +261,6 @@ class PhotoboothFlowState extends ChangeNotifier {
 
     final String pathToDelete = _capturedImages[_currentGalleryIndex];
 
-    // Elimina fisicamente il file per liberare spazio e garantire la privacy
     try {
       final file = File(pathToDelete);
       if (await file.exists()) {
@@ -248,31 +270,36 @@ class PhotoboothFlowState extends ChangeNotifier {
       debugPrint('Errore durante la cancellazione del file $pathToDelete: $e');
     }
 
-    // Rimuove la foto dalle liste interne
     _capturedImages.removeAt(_currentGalleryIndex);
     _selectedShareImages.remove(pathToDelete);
 
     if (_capturedImages.isEmpty) {
-      // Se non ci sono più foto, torna alla home
       resetToHome();
     } else {
-      // Regola l'indice per rimanere nei limiti
       if (_currentGalleryIndex >= _capturedImages.length) {
         _currentGalleryIndex = _capturedImages.length - 1;
       }
       notifyListeners();
 
-      // Riavvia il timer di auto-reset per inattività
       _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
         resetToHome();
       });
     }
   }
 
+  // Stub per Edit (out of scope, v3 D6)
+  void editPhoto() {
+    debugPrint('editPhoto: out of scope for v3');
+  }
+
+  // Stub per Print (out of scope, v3 D6)
+  void printPhoto() {
+    debugPrint('printPhoto: out of scope for v3');
+  }
+
   // Inizia il flusso di condivisione
   void startShareFlow() {
     _cancelTimers();
-    // Seleziona tutte le foto di default
     _selectedShareImages.clear();
     _selectedShareImages.addAll(_capturedImages);
     _state = PhotoboothState.shareSelection;
@@ -289,32 +316,53 @@ class PhotoboothFlowState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Conferma la selezione e mostra la schermata col QR Code
-  void completeShareSelection() {
+  // Conferma la selezione: se tutte le foto sono selezionate vai diretto
+  // all'upload, altrimenti mostra l'overlay di conferma.
+  void confirmShareSelection() {
     _cancelTimers();
-    _state = PhotoboothState.shareQr;
-    _shareCountdownValue = 30; // 30 secondi temporanei
+    if (_selectedShareImages.length == _capturedImages.length) {
+      _startShareUploading();
+    } else {
+      _state = PhotoboothState.shareConfirm;
+      notifyListeners();
+    }
+  }
+
+  void cancelShareConfirm() {
+    _cancelTimers();
+    _state = PhotoboothState.shareSelection;
+    notifyListeners();
+  }
+
+  void proceedShareUpload() => _startShareUploading();
+
+  void _startShareUploading() {
+    _cancelTimers();
+    _state = PhotoboothState.shareUploading;
     notifyListeners();
 
-    _shareTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_shareCountdownValue > 1) {
-        _shareCountdownValue--;
-        notifyListeners();
-      } else {
-        timer.cancel();
-        // Torna a home dopo la scadenza del qr code
-        resetToHome();
-      }
+    _shareUploadingTimer = Timer(AppDurations.shareUploading, () {
+      _showShareQr();
     });
   }
 
-  // Annulla il flusso di condivisione e torna alla schermata dei risultati
+  void _showShareQr() {
+    _cancelTimers();
+    _state = PhotoboothState.shareQr;
+    _shareQrDeadline = DateTime.now().add(AppDurations.shareQrAutoReset);
+    notifyListeners();
+
+    _shareTimer = Timer(AppDurations.shareQrAutoReset, () {
+      resetToHome();
+    });
+  }
+
+  // Torna alla schermata dei risultati dal flusso di condivisione
   void cancelShareSelection() {
     _cancelTimers();
     _state = PhotoboothState.result;
     notifyListeners();
 
-    // Riavvia il timer di auto-reset dei risultati
     _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
       resetToHome();
     });
@@ -324,6 +372,8 @@ class PhotoboothFlowState extends ChangeNotifier {
     _countdownTimer?.cancel();
     _autoResetTimer?.cancel();
     _shareTimer?.cancel();
+    _captureEndTimer?.cancel();
+    _shareUploadingTimer?.cancel();
   }
 
   @override
