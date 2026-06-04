@@ -95,6 +95,8 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onDone: _flowState.handleDoneClick,
           onDelete: _flowState.deletePhotos,
           onShare: _flowState.startShareFlow,
+          onEdit: _flowState.editPhoto,
+          onPrint: _flowState.printPhoto,
           showDoneToolbar: _flowState.showDoneToolbar,
           capturedImages: _flowState.capturedImages,
           currentGalleryIndex: _flowState.currentGalleryIndex,
