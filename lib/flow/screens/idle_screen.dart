@@ -19,13 +19,13 @@ class IdleScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo Next House Copenhagen da Figma
-              Image.network(
-                'http://localhost:3845/assets/e9108d7c9f046f4af4488df44bec74f286ab1109.png',
+              // Logo Next House Copenhagen da Figma (local asset)
+              Image.asset(
+                'assets/images/nexthouse_logo.png',
                 height: 250.0,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  // Fallback se il server locale non risponde
+                  // Fallback se il file locale non viene caricato
                   return const Text(
                     'Next House\nCOPENHAGEN',
                     style: TextStyle(
@@ -41,29 +41,28 @@ class IdleScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.s48),
 
-              // Pulsante "TAKE A SELFIE" con gli angoli asimmetrici
+              // Pulsante "TAKE A SELFIE" con gli angoli asimmetrici e font Saira Stencil One da Figma
               GestureDetector(
                 onTap: onStart,
                 child: Container(
-                  width: 620.0,
-                  height: 140.0,
+                  width: 694.0,
+                  height: 171.0,
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
                     color: Color(0xFF4D5358), // NextHouse Black (Charcoal)
                     borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(70.0),
-                      bottomLeft: Radius.circular(70.0),
-                      bottomRight: Radius.circular(70.0),
+                      topRight: Radius.circular(80.0),
+                      bottomLeft: Radius.circular(80.0),
+                      bottomRight: Radius.circular(80.0),
                     ),
                   ),
                   child: const Text(
                     'TAKE A SELFIE',
                     style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 56.0,
-                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Saira Stencil One',
+                      fontSize: 84.0, // Utilizziamo 84.0 anziché 96.0 per prevenire eventuali overflow in Flutter
+                      fontWeight: FontWeight.normal,
                       color: Colors.white,
-                      letterSpacing: 3.0,
                     ),
                   ),
                 ),
