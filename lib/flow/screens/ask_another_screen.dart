@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
+import '../../theme/app_text_styles.dart';
 import '../../widgets/camera_placeholder.dart';
 
 class AskAnotherScreen extends StatelessWidget {
@@ -79,13 +80,7 @@ class AskAnotherScreen extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'Do you want to take another picture?',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 36.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        height: 1.2,
-                      ),
+                      style: AppTextStyles.askAnotherTitle,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -101,7 +96,7 @@ class AskAnotherScreen extends StatelessWidget {
                       text: 'Yes',
                       onPressed: onYes,
                     ),
-                    
+
                     // Pulsante No
                     _buildDialogButton(
                       text: 'No',
@@ -137,11 +132,7 @@ class AskAnotherScreen extends StatelessWidget {
         onPressed: onPressed,
         child: Text(
           text,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.askAnotherChoice,
         ),
       ),
     );
