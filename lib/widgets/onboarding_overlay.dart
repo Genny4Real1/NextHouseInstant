@@ -52,25 +52,27 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Stack(
-        children: <Widget>[
-          // Backdrop: tap anywhere to dismiss.
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: widget.onDismiss,
-              child: ColoredBox(color: Colors.black.withAlpha(89)),
-            ),
+    return Stack(
+      children: <Widget>[
+        // Backdrop: tap anywhere to dismiss.
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onDismiss,
+            child: ColoredBox(color: Colors.black.withAlpha(89)),
           ),
-          // Hint card.
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: widget.margin,
+        ),
+        // Hint card. Tapping the card itself also dismisses.
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: widget.margin,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.onDismiss,
                 child: Material(
                   color: Colors.transparent,
                   child: Container(
@@ -122,8 +124,8 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
