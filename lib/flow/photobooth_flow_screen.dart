@@ -116,7 +116,6 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
       case PhotoboothState.shareQr:
         return PhotoGalleryScreenShare2(
           key: const ValueKey('shareQr'),
-          countdownValue: _flowState.shareCountdownValue,
           selectedImages: _flowState.selectedShareImages,
           onDone: _flowState.resetToHome,
         );
