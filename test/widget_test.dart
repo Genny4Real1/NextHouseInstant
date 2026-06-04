@@ -1,30 +1,39 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:nexthouse_instant/main.dart';
+import 'package:nexthouse_instant/flow/screens/idle_screen.dart';
+import 'package:nexthouse_instant/flow/screens/processing_screen.dart';
+import 'package:nexthouse_instant/theme/app_theme.dart';
+
+Widget _wrap(Widget child) =>
+    MaterialApp(theme: AppTheme.darkTheme, home: child);
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('IdleScreen renders logo and CTA, taps fire onStart', (
+    WidgetTester tester,
+  ) async {
+    var tapped = 0;
+    await tester.pumpWidget(_wrap(IdleScreen(onStart: () => tapped++)));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('TAKE A SELFIE'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.text('TAKE A SELFIE'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(tapped, 1);
+  });
+
+  testWidgets('ProcessingScreen renders bundled spinner and Processing text', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(const ProcessingScreen(capturedImagePath: null)),
+    );
+
+    expect(find.text('Processing'), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
+
+    // Una rotazione del controller (2s) deve essere priva di eccezioni.
+    await tester.pump(const Duration(seconds: 2));
   });
 }

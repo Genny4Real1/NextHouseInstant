@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
-import '../../widgets/camera_placeholder.dart';
+import '../../theme/app_durations.dart';
+import '../../widgets/processing_card.dart';
 
+/// Figma node 33:23 — `Camera Screen Processing` (1280x800, black bg).
+/// The screen renders a blurred background photo (Figma 33:24) and the
+/// orange `ProcessingCard` (Figma 74:86) positioned at the Figma frame's
+/// absolute coordinates.
 class ProcessingScreen extends StatefulWidget {
   final String? capturedImagePath;
 
-  const ProcessingScreen({
-    super.key,
-    this.capturedImagePath,
-  });
+  const ProcessingScreen({super.key, this.capturedImagePath});
 
   @override
   State<ProcessingScreen> createState() => _ProcessingScreenState();
@@ -24,9 +24,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   @override
   void initState() {
     super.initState();
-    // Animazione di rotazione continua (1 giro completo ogni 2 secondi)
     _rotationController = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: AppDurations.processingRotation,
       vsync: this,
     )..repeat();
   }
@@ -39,99 +38,44 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
   @override
   Widget build(BuildContext context) {
-    final bool hasCapturedImage = widget.capturedImagePath != null && widget.capturedImagePath!.isNotEmpty;
+    final bool hasCapturedImage =
+        widget.capturedImagePath != null &&
+        widget.capturedImagePath!.isNotEmpty;
 
     return Stack(
       children: [
-        // Sfondo sfocato dell'ultima foto scattata
-        Positioned.fill(
+        // 1. Sfondo nero a tutto schermo
+        Container(color: Colors.black),
+
+        // 2. Foto sfocata di sfondo, posizionata come da Figma (33:24)
+        Positioned(
+          left: 29.0,
+          top: 1.0,
+          width: 1212.0,
+          height: 808.0,
           child: ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-            child: Container(
-              color: Colors.black,
-              child: Opacity(
-                opacity: 0.7,
-                child: hasCapturedImage
-                    ? Image.file(
-                        File(widget.capturedImagePath!),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const CameraPlaceholder(showGuides: false),
-                      )
-                    : const CameraPlaceholder(showGuides: false),
-              ),
-            ),
+            imageFilter: ImageFilter.blur(sigmaX: 3.5, sigmaY: 3.5),
+            child: hasCapturedImage
+                ? Image.file(
+                    File(widget.capturedImagePath!),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/images/processing_bg_sample.png',
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Image.asset(
+                    'assets/images/processing_bg_sample.png',
+                    fit: BoxFit.cover,
+                  ),
           ),
         ),
 
-        // Sfondo semitrasparente
-        Positioned.fill(
-          child: Container(
-            color: Colors.black.withAlpha(50),
-          ),
-        ),
-
-        // Box arancione centrale di elaborazione
-        Center(
-          child: Container(
-            width: 600.0,
-            height: 440.0,
-            padding: const EdgeInsets.symmetric(
-              vertical: 40.0,
-              horizontal: AppSpacing.s48,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.nextHouseOrange,
-              borderRadius: BorderRadius.circular(60.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(76),
-                  blurRadius: 30.0,
-                  offset: const Offset(0.0, 15.0),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Testo "Processing"
-                const Text(
-                  'Processing',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 72.0,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: 1.0,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40.0),
-
-                // Ruota di caricamento che gira da Figma
-                RotationTransition(
-                  turns: _rotationController,
-                  child: Image.network(
-                    'http://localhost:3845/assets/d8785036d17612960f0b02a9176166b7c5010ebc.png',
-                    width: 220.0,
-                    height: 220.0,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Fallback se il server locale non risponde
-                      return const SizedBox(
-                        width: 100.0,
-                        height: 100.0,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 6.0,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+        // 3. Card arancione "Processing" (Figma 74:86)
+        Positioned(
+          left: 334.56,
+          top: 178.02,
+          child: ProcessingCard(rotation: _rotationController),
         ),
       ],
     );

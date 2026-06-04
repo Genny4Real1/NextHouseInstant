@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
+import '../../theme/app_text_styles.dart';
+import '../../widgets/kiosk_button.dart';
 
+/// Figma node 28:234 — `Frame 2` (864x521.86) on the white "Start Page".
+/// Hosts the `NextHouse_Logo` (28:235) and the asymmetric `NextHouse_Selfie_Button`
+/// (28:236) routed through the extended `KioskButton`.
 class IdleScreen extends StatelessWidget {
   final VoidCallback onStart;
 
-  const IdleScreen({
-    super.key,
-    required this.onStart,
-  });
+  const IdleScreen({super.key, required this.onStart});
+
+  static const _selfieButtonBorderRadius = BorderRadius.only(
+    topRight: Radius.circular(80.0),
+    bottomLeft: Radius.circular(80.0),
+    bottomRight: Radius.circular(80.0),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +34,9 @@ class IdleScreen extends StatelessWidget {
                 height: 250.0,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  // Fallback se il file locale non viene caricato
-                  return const Text(
+                  return Text(
                     'Next House\nCOPENHAGEN',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
+                    style: AppTextStyles.body.copyWith(
                       fontSize: 48.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -41,31 +48,17 @@ class IdleScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.s48),
 
-              // Pulsante "TAKE A SELFIE" con gli angoli asimmetrici e font Saira Stencil One da Figma
-              GestureDetector(
-                onTap: onStart,
-                child: Container(
-                  width: 694.0,
-                  height: 171.0,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4D5358), // NextHouse Black (Charcoal)
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(80.0),
-                      bottomLeft: Radius.circular(80.0),
-                      bottomRight: Radius.circular(80.0),
-                    ),
-                  ),
-                  child: const Text(
-                    'TAKE A SELFIE',
-                    style: TextStyle(
-                      fontFamily: 'Saira Stencil One',
-                      fontSize: 84.0, // Utilizziamo 84.0 anziché 96.0 per prevenire eventuali overflow in Flutter
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+              // CTA "TAKE A SELFIE" (Figma 28:236) — geometria intenzionalmente
+              // cablata sui valori del Figma frame (AGENT.md §1.4).
+              KioskButton(
+                text: 'TAKE A SELFIE',
+                onPressed: onStart,
+                backgroundColor: AppColors.nextHouseBlack,
+                textColor: Colors.white,
+                width: 694.0,
+                height: 171.0,
+                borderRadius: _selfieButtonBorderRadius,
+                textStyle: AppTextStyles.kioskCta,
               ),
             ],
           ),

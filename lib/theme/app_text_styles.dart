@@ -39,4 +39,20 @@ class AppTextStyles {
     fontWeight: FontWeight.normal,
     color: AppColors.textSecondary,
   );
+
+  // Figma: NextHouse_SpinningProcessing text node (74:76) - Inter Regular 96px white
+  static const TextStyle processingTitle = TextStyle(
+    fontFamily: 'Inter',
+    fontSize: 96.0,
+    fontWeight: FontWeight.w400,
+    color: Colors.white,
+  );
+
+  // Figma: NextHouse_Selfie_Button text node (I28:236;25:18) - Saira Stencil One 96px white
+  static const TextStyle kioskCta = TextStyle(
+    fontFamily: 'Saira Stencil One',
+    fontSize: 96.0,
+    fontWeight: FontWeight.normal,
+    color: Colors.white,
+  );
 }
