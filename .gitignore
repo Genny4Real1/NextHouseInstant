@@ -120,3 +120,6 @@ app.*.symbols
 
 # Android Studio Cache
 .idea/
+.vscode/
+
+PLAN.md
