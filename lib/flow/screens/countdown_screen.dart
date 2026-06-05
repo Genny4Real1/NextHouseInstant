@@ -32,13 +32,15 @@ class _CountdownScreenState extends State<CountdownScreen> {
   bool _showOnboarding = true;
 
   bool get _isCameraActive =>
-      widget.cameraController != null && widget.cameraController!.value.isInitialized;
+      widget.cameraController != null &&
+      widget.cameraController!.value.isInitialized;
 
-  bool get _showTextOverlay =>
-      widget.introActive || widget.countdownValue >= 4;
+  bool get _showTextOverlay => widget.introActive || widget.countdownValue >= 4;
 
   bool get _showNumberOverlay =>
-      !widget.introActive && widget.countdownValue >= 1 && widget.countdownValue <= 5;
+      !widget.introActive &&
+      widget.countdownValue >= 1 &&
+      widget.countdownValue <= 5;
 
   @override
   Widget build(BuildContext context) {
@@ -112,4 +114,3 @@ class _CountdownScreenState extends State<CountdownScreen> {
     );
   }
 }
-

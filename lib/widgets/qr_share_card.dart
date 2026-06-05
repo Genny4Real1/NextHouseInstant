@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
 /// Figma `Frame 7` QR share card (48:152) - 570.24x648.24 white rounded card
@@ -10,11 +11,7 @@ class QrShareCard extends StatelessWidget {
   final String data;
   final double progress;
 
-  const QrShareCard({
-    super.key,
-    required this.data,
-    this.progress = 0.0,
-  });
+  const QrShareCard({super.key, required this.data, this.progress = 0.0});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +64,7 @@ class QrShareCard extends StatelessWidget {
               minHeight: 4.0,
               backgroundColor: const Color(0xFFE0E0E0),
               valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF1E293B),
+                AppColors.surface,
               ),
             ),
           ),

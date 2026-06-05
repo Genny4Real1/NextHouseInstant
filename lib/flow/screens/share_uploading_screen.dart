@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_durations.dart';
 import '../../widgets/processing_card.dart';
 import '../../widgets/share_photo_strip.dart';
 
@@ -7,10 +8,7 @@ import '../../widgets/share_photo_strip.dart';
 class ShareUploadingScreen extends StatefulWidget {
   final List<String> capturedImages;
 
-  const ShareUploadingScreen({
-    super.key,
-    required this.capturedImages,
-  });
+  const ShareUploadingScreen({super.key, required this.capturedImages});
 
   @override
   State<ShareUploadingScreen> createState() => _ShareUploadingScreenState();
@@ -25,7 +23,7 @@ class _ShareUploadingScreenState extends State<ShareUploadingScreen>
     super.initState();
     _rotationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: AppDurations.processingRotation,
     )..repeat();
   }
 
@@ -61,9 +59,7 @@ class _ShareUploadingScreenState extends State<ShareUploadingScreen>
             ),
           ),
           // Centered spinner
-          Center(
-            child: ProcessingCard(rotation: _rotationController),
-          ),
+          Center(child: ProcessingCard(rotation: _rotationController)),
         ],
       ),
     );

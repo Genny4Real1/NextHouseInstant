@@ -155,11 +155,7 @@ class _PhotoSelectionShareScreenState extends State<PhotoSelectionShareScreen> {
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: const Center(
-        child: Icon(
-          Icons.image_outlined,
-          color: Colors.white24,
-          size: 48.0,
-        ),
+        child: Icon(Icons.image_outlined, color: Colors.white24, size: 48.0),
       ),
     );
   }

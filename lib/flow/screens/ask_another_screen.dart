@@ -20,7 +20,8 @@ class AskAnotherScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasCapturedImage = capturedImagePath != null && capturedImagePath!.isNotEmpty;
+    final bool hasCapturedImage =
+        capturedImagePath != null && capturedImagePath!.isNotEmpty;
 
     return Stack(
       children: [
@@ -46,11 +47,7 @@ class AskAnotherScreen extends StatelessWidget {
         ),
 
         // Sfondo semitrasparente scuro per concentrare l'attenzione
-        Positioned.fill(
-          child: Container(
-            color: Colors.black.withAlpha(50),
-          ),
-        ),
+        Positioned.fill(child: Container(color: Colors.black.withAlpha(50))),
 
         // Dialogo di richiesta al centro
         Center(
@@ -92,16 +89,10 @@ class AskAnotherScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // Pulsante Sì
-                    _buildDialogButton(
-                      text: 'Yes',
-                      onPressed: onYes,
-                    ),
+                    _buildDialogButton(text: 'Yes', onPressed: onYes),
 
                     // Pulsante No
-                    _buildDialogButton(
-                      text: 'No',
-                      onPressed: onNo,
-                    ),
+                    _buildDialogButton(text: 'No', onPressed: onNo),
                   ],
                 ),
               ],
@@ -130,10 +121,7 @@ class AskAnotherScreen extends StatelessWidget {
           ),
         ),
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: AppTextStyles.askAnotherChoice,
-        ),
+        child: Text(text, style: AppTextStyles.askAnotherChoice),
       ),
     );
   }

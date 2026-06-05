@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../theme/app_durations.dart';
+import '../../theme/app_spacing.dart';
 import '../../theme/app_text_styles.dart';
 import '../../widgets/qr_share_card.dart';
 
@@ -26,8 +28,8 @@ class PhotoGalleryScreenShare2 extends StatefulWidget {
 class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
   Timer? _refreshTimer;
   double _progress = 1.0;
-  static const Duration _refreshInterval = Duration(milliseconds: 100);
-  static const Duration _autoReset = Duration(seconds: 60);
+  static const Duration _refreshInterval = AppDurations.shareQrProgressRefresh;
+  static const Duration _autoReset = AppDurations.shareQrAutoReset;
   DateTime? _deadline;
 
   @override
@@ -85,10 +87,7 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
               right: 0,
               bottom: 24.0,
               child: const Center(
-                child: Text(
-                  'Tap to go back',
-                  style: AppTextStyles.tapToGoBack,
-                ),
+                child: Text('Tap to go back', style: AppTextStyles.tapToGoBack),
               ),
             ),
             // Top-right close
@@ -102,7 +101,7 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     color: Colors.white.withAlpha(20),
                     shape: BoxShape.circle,
                   ),
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppSpacing.s8),
                   child: const Icon(
                     Icons.close_rounded,
                     color: Colors.white,

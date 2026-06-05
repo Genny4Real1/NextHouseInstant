@@ -23,9 +23,13 @@ class SharePhotoStrip extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Expanded(child: _photo(path: leftPhotoPath, asset: leftFallbackAsset)),
+        Expanded(
+          child: _photo(path: leftPhotoPath, asset: leftFallbackAsset),
+        ),
         const SizedBox(width: 32.0),
-        Expanded(child: _photo(path: rightPhotoPath, asset: rightFallbackAsset)),
+        Expanded(
+          child: _photo(path: rightPhotoPath, asset: rightFallbackAsset),
+        ),
       ],
     );
   }

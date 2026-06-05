@@ -31,7 +31,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
       ignoring: !_showFlash,
       child: AnimatedOpacity(
         opacity: _showFlash ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 250),
+        duration: AppDurations.flashOpacity,
         curve: Curves.easeOut,
         child: const ColoredBox(color: Colors.white),
       ),

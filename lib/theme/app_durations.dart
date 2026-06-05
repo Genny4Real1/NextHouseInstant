@@ -32,4 +32,10 @@ class AppDurations {
 
   // Share QR auto-reset - bumped from 30s to 60s (UI shows only a thin progress bar, not a number)
   static const Duration shareQrAutoReset = Duration(seconds: 60);
+
+  // CaptureScreen flash opacity fade (250ms)
+  static const Duration flashOpacity = Duration(milliseconds: 250);
+
+  // Share QR LinearProgressIndicator refresh tick (100ms)
+  static const Duration shareQrProgressRefresh = Duration(milliseconds: 100);
 }

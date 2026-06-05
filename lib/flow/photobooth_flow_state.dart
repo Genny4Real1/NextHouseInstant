@@ -180,7 +180,9 @@ class PhotoboothFlowState extends ChangeNotifier {
   void showGallery() {
     _cancelTimers();
     _state = PhotoboothState.result;
-    _currentGalleryIndex = _capturedImages.isNotEmpty ? _capturedImages.length - 1 : 0;
+    _currentGalleryIndex = _capturedImages.isNotEmpty
+        ? _capturedImages.length - 1
+        : 0;
     _showDoneToolbar = true;
     notifyListeners();
 

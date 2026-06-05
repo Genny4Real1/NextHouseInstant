@@ -8,11 +8,7 @@ class ThumbnailCheckmark extends StatelessWidget {
   final bool isSelected;
   final VoidCallback? onTap;
 
-  const ThumbnailCheckmark({
-    super.key,
-    required this.isSelected,
-    this.onTap,
-  });
+  const ThumbnailCheckmark({super.key, required this.isSelected, this.onTap});
 
   @override
   Widget build(BuildContext context) {

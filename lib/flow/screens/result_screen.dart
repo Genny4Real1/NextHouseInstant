@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_durations.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_text_styles.dart';
 import '../../widgets/camera_placeholder.dart';
@@ -70,7 +71,7 @@ class _ResultScreenState extends State<ResultScreen> {
         widget.currentGalleryIndex != _pageController.page?.round()) {
       _pageController.animateToPage(
         widget.currentGalleryIndex,
-        duration: const Duration(milliseconds: 300),
+        duration: AppDurations.pageTransition,
         curve: Curves.easeInOut,
       );
     }
@@ -102,11 +103,15 @@ class _ResultScreenState extends State<ResultScreen> {
                     builder: (context, child) {
                       double scale = 1.0;
                       if (_pageController.position.haveDimensions) {
-                        double page = _pageController.page ?? widget.currentGalleryIndex.toDouble();
+                        double page =
+                            _pageController.page ??
+                            widget.currentGalleryIndex.toDouble();
                         double diff = page - index;
                         scale = (1 - (diff.abs() * 0.15)).clamp(0.8, 1.0);
                       } else {
-                        scale = index == widget.currentGalleryIndex ? 1.0 : 0.85;
+                        scale = index == widget.currentGalleryIndex
+                            ? 1.0
+                            : 0.85;
                       }
                       return Center(
                         child: Transform.scale(
@@ -136,7 +141,9 @@ class _ResultScreenState extends State<ResultScreen> {
                                   File(path),
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                      const CameraPlaceholder(showGuides: false),
+                                      const CameraPlaceholder(
+                                        showGuides: false,
+                                      ),
                                 ),
                               ),
                             ),
@@ -192,20 +199,30 @@ class _ResultScreenState extends State<ResultScreen> {
               ),
 
             // Left chevron
-            if (widget.showDoneToolbar && hasImages && widget.capturedImages.length > 1)
+            if (widget.showDoneToolbar &&
+                hasImages &&
+                widget.capturedImages.length > 1)
               Positioned(
                 left: 7.76,
                 child: Center(
-                  child: GalleryChevron(isLeft: true, onPressed: widget.onPrevious),
+                  child: GalleryChevron(
+                    isLeft: true,
+                    onPressed: widget.onPrevious,
+                  ),
                 ),
               ),
 
             // Right chevron
-            if (widget.showDoneToolbar && hasImages && widget.capturedImages.length > 1)
+            if (widget.showDoneToolbar &&
+                hasImages &&
+                widget.capturedImages.length > 1)
               Positioned(
                 right: 7.76,
                 child: Center(
-                  child: GalleryChevron(isLeft: false, onPressed: widget.onNext),
+                  child: GalleryChevron(
+                    isLeft: false,
+                    onPressed: widget.onNext,
+                  ),
                 ),
               ),
 
@@ -224,10 +241,24 @@ class _ResultScreenState extends State<ResultScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      GalleryButton(action: GalleryAction.edit, onPressed: widget.onEdit, disabled: true),
-                      GalleryButton(action: GalleryAction.share, onPressed: widget.onShare),
-                      GalleryButton(action: GalleryAction.delete, onPressed: widget.onDelete),
-                      GalleryButton(action: GalleryAction.print, onPressed: widget.onPrint, disabled: true),
+                      GalleryButton(
+                        action: GalleryAction.edit,
+                        onPressed: widget.onEdit,
+                        disabled: true,
+                      ),
+                      GalleryButton(
+                        action: GalleryAction.share,
+                        onPressed: widget.onShare,
+                      ),
+                      GalleryButton(
+                        action: GalleryAction.delete,
+                        onPressed: widget.onDelete,
+                      ),
+                      GalleryButton(
+                        action: GalleryAction.print,
+                        onPressed: widget.onPrint,
+                        disabled: true,
+                      ),
                     ],
                   ),
                 ),

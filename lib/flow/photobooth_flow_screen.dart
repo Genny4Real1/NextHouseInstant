@@ -69,13 +69,9 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           cameraController: _flowState.cameraController,
         );
       case PhotoboothState.captureEnd:
-        return CaptureEndScreen(
-          key: const ValueKey('captureEnd'),
-        );
+        return CaptureEndScreen(key: const ValueKey('captureEnd'));
       case PhotoboothState.captureFeedback:
-        return const CaptureScreen(
-          key: ValueKey('capture'),
-        );
+        return const CaptureScreen(key: ValueKey('capture'));
       case PhotoboothState.processing:
         return ProcessingScreen(
           key: const ValueKey('processing'),

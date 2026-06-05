@@ -72,7 +72,10 @@ class GalleryButton extends StatelessWidget {
     );
 
     if (disabled) {
-      return Opacity(opacity: 0.4, child: SizedBox(width: width, child: body));
+      return Opacity(
+        opacity: 0.4,
+        child: SizedBox(width: width, child: body),
+      );
     }
 
     return SizedBox(
