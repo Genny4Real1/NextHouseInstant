@@ -42,3 +42,7 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    implementation("com.burhanrashid52:photoeditor:3.1.0")
+}
