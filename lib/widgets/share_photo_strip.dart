@@ -7,15 +7,11 @@ import 'package:flutter/material.dart';
 class SharePhotoStrip extends StatelessWidget {
   final String? leftPhotoPath;
   final String? rightPhotoPath;
-  final String leftFallbackAsset;
-  final String rightFallbackAsset;
 
   const SharePhotoStrip({
     super.key,
     this.leftPhotoPath,
     this.rightPhotoPath,
-    this.leftFallbackAsset = 'assets/images/processing_bg_sample.png',
-    this.rightFallbackAsset = 'assets/images/processing_bg_sample.png',
   });
 
   @override
@@ -24,23 +20,23 @@ class SharePhotoStrip extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Expanded(
-          child: _photo(path: leftPhotoPath, asset: leftFallbackAsset),
+          child: _photo(path: leftPhotoPath),
         ),
         const SizedBox(width: 32.0),
         Expanded(
-          child: _photo(path: rightPhotoPath, asset: rightFallbackAsset),
+          child: _photo(path: rightPhotoPath),
         ),
       ],
     );
   }
 
-  Widget _photo({String? path, required String asset}) {
+  Widget _photo({String? path}) {
     if (path != null && path.isNotEmpty) {
       final File file = File(path);
       if (file.existsSync()) {
         return Image.file(file, fit: BoxFit.cover, gaplessPlayback: true);
       }
     }
-    return Image.asset(asset, fit: BoxFit.cover, gaplessPlayback: true);
+    return const ColoredBox(color: Colors.black);
   }
 }

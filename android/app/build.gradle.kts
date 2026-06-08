@@ -42,3 +42,12 @@ android {
 flutter {
     source = "../.."
 }
+<<<<<<< Updated upstream
+=======
+
+dependencies {
+    implementation("com.burhanrashid52:photoeditor:3.1.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.core:core-ktx:1.10.1")
+}
+>>>>>>> Stashed changes

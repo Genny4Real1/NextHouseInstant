@@ -59,15 +59,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 ? Image.file(
                     File(widget.capturedImagePath!),
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/images/processing_bg_sample.png',
-                      fit: BoxFit.cover,
-                    ),
+                    errorBuilder: (context, error, stackTrace) =>
+                        const ColoredBox(color: Colors.black),
                   )
-                : Image.asset(
-                    'assets/images/processing_bg_sample.png',
-                    fit: BoxFit.cover,
-                  ),
+                : const ColoredBox(color: Colors.black),
           ),
         ),
 

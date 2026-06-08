@@ -79,7 +79,7 @@ class _CameraScreenState extends State<CameraScreen>
                     ? Image.file(
                         File(widget.capturedImagePath!),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
+                        errorBuilder: (context, error, stackTrace) =>
                             const ColoredBox(color: Colors.black),
                       )
                     : const ColoredBox(color: Colors.black),

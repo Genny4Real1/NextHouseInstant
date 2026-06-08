@@ -76,7 +76,7 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     ? Image.file(
                         File(widget.selectedImages.first),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
+                        errorBuilder: (context, error, stackTrace) =>
                             const ColoredBox(color: Colors.black),
                       )
                     : const ColoredBox(color: Colors.black),

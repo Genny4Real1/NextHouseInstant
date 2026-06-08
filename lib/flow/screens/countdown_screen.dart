@@ -49,7 +49,7 @@ class CountdownScreen extends StatelessWidget {
                     ? Image.file(
                         File(capturedImagePath!),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
+                        errorBuilder: (context, error, stackTrace) =>
                             const ColoredBox(color: Colors.black),
                       )
                     : const ColoredBox(color: Colors.black),
