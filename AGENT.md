@@ -478,3 +478,14 @@ Before claiming a Figma hand-off is integrated, verify all of the following:
 - Reusable widgets: `lib/widgets/*.dart`
 - Plan / in-flight tasks: `PLAN.md`
 - Brand source assets: `DesignPlanning/BrandGuideLines/`
+
+## Automated Verification Commands
+
+| Check | Command |
+|---|---|
+| Unit tests | `./gradlew test` |
+| Instrumented tests | `./gradlew connectedAndroidTest` |
+| Lint | `./gradlew lint` |
+| Build | `./gradlew assembleDebug` |
+
+Always run these after changes and fix any failures before considering a task done.

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
 import '../../theme/app_text_styles.dart';
 import '../../widgets/kiosk_button.dart';
+import '../../widgets/nexthouse_instant_logo.dart';
 
-/// Figma node 28:234 — `Frame 2` (864x521.86) on the white "Start Page".
-/// Hosts the `NextHouse_Logo` (28:235) and the asymmetric `NextHouse_Selfie_Button`
-/// (28:236) routed through the extended `KioskButton`.
+/// Figma node 1:2 — "Start Page" (white bg).
+/// Hosts the Nexthouseinstant_logo (257:209) and the asymmetric
+/// NextHouse_Selfie_Button (28:236).
 class IdleScreen extends StatelessWidget {
   final VoidCallback onStart;
 
@@ -28,25 +28,12 @@ class IdleScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo Next House Copenhagen da Figma (local asset)
-              Image.asset(
-                'assets/images/nexthouse_logo.png',
-                height: 250.0,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Text(
-                    'Next House\nCOPENHAGEN',
-                    style: AppTextStyles.body.copyWith(
-                      fontSize: 48.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      letterSpacing: 2.0,
-                    ),
-                    textAlign: TextAlign.center,
-                  );
-                },
+              // Nexthouseinstant_logo (Figma 257:209)
+              const NexthouseInstantLogo(
+                width: 719.0,
+                height: 509.322,
               ),
-              const SizedBox(height: AppSpacing.s48),
+              const SizedBox(height: 48.0),
 
               // CTA "TAKE A SELFIE" (Figma 28:236) — geometria intenzionalmente
               // cablata sui valori del Figma frame (AGENT.md §1.4).

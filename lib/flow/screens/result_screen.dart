@@ -24,6 +24,8 @@ class ResultScreen extends StatefulWidget {
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final ValueChanged<int> onPageChanged;
+  final bool isFirstImage;
+  final bool isLastImage;
 
   const ResultScreen({
     super.key,
@@ -39,6 +41,8 @@ class ResultScreen extends StatefulWidget {
     required this.onPrevious,
     required this.onNext,
     required this.onPageChanged,
+    this.isFirstImage = false,
+    this.isLastImage = false,
   });
 
   @override
@@ -208,6 +212,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   child: GalleryChevron(
                     isLeft: true,
                     onPressed: widget.onPrevious,
+                    disabled: widget.isFirstImage,
                   ),
                 ),
               ),
@@ -222,6 +227,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   child: GalleryChevron(
                     isLeft: false,
                     onPressed: widget.onNext,
+                    disabled: widget.isLastImage,
                   ),
                 ),
               ),

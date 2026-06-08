@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../theme/app_durations.dart';
@@ -55,10 +56,12 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
     super.dispose();
   }
 
+  String get _stableUrl =>
+      'https://nexthouse.it/share/gallery?count=${widget.selectedImages.length}';
+
   @override
   Widget build(BuildContext context) {
-    final String shareUrl =
-        'https://nexthouse.it/share/gallery?count=${widget.selectedImages.length}&t=${DateTime.now().millisecondsSinceEpoch}';
+    final String shareUrl = _stableUrl;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -69,12 +72,14 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
             Positioned.fill(
               child: ImageFiltered(
                 imageFilter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
-                child: Image.asset(
-                  'assets/images/processing_bg_sample.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) =>
-                      const ColoredBox(color: Colors.black),
-                ),
+                child: widget.selectedImages.isNotEmpty
+                    ? Image.file(
+                        File(widget.selectedImages.first),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const ColoredBox(color: Colors.black),
+                      )
+                    : const ColoredBox(color: Colors.black),
               ),
             ),
             // Centered QR card

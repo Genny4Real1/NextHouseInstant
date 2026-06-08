@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'photobooth_flow_state.dart';
 import '../theme/app_durations.dart';
 import 'screens/idle_screen.dart';
+import 'screens/camera_screen.dart';
 import 'screens/countdown_screen.dart';
 import 'screens/capture_screen.dart';
 import 'screens/capture_end_screen.dart';
@@ -61,12 +62,20 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           key: const ValueKey('idle'),
           onStart: _flowState.startFlow,
         );
+      case PhotoboothState.camera:
+        return CameraScreen(
+          key: const ValueKey('camera'),
+          cameraController: _flowState.cameraController,
+          onRecord: _flowState.startCountdown,
+          capturedImagePath: _flowState.capturedImagePath,
+        );
       case PhotoboothState.countdown:
         return CountdownScreen(
           key: const ValueKey('countdown'),
           countdownValue: _flowState.countdownValue,
           introActive: _flowState.introActive,
           cameraController: _flowState.cameraController,
+          capturedImagePath: _flowState.capturedImagePath,
         );
       case PhotoboothState.captureEnd:
         return CaptureEndScreen(key: const ValueKey('captureEnd'));
@@ -74,7 +83,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
         return const CaptureScreen(key: ValueKey('capture'));
       case PhotoboothState.processing:
         return ProcessingScreen(
-          key: const ValueKey('processing'),
+          key: ValueKey('processing_${_flowState.capturedImagePath}'),
           capturedImagePath: _flowState.capturedImagePath,
         );
       case PhotoboothState.askAnother:
@@ -99,6 +108,8 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onPrevious: _flowState.previousImage,
           onNext: _flowState.nextImage,
           onPageChanged: _flowState.setGalleryIndex,
+          isFirstImage: _flowState.isFirstImage,
+          isLastImage: _flowState.isLastImage,
         );
       case PhotoboothState.shareSelection:
         return PhotoSelectionShareScreen(

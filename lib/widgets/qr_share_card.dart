@@ -61,10 +61,10 @@ class QrShareCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(4.0),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
-              minHeight: 4.0,
+              minHeight: 8.0,
               backgroundColor: const Color(0xFFE0E0E0),
               valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.surface,
+                AppColors.nextHouseOrange,
               ),
             ),
           ),

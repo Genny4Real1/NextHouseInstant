@@ -6,6 +6,7 @@ import '../theme/app_durations.dart';
 
 enum PhotoboothState {
   idle,
+  camera,
   countdown,
   captureEnd,
   captureFeedback,
@@ -45,7 +46,8 @@ class PhotoboothFlowState extends ChangeNotifier {
   bool get introActive => _introActive;
   CameraController? get cameraController => _cameraController;
   bool get isCameraInitialized => _isCameraInitialized;
-  String? get capturedImagePath => _capturedImagePath;
+  String? get capturedImagePath =>
+      _capturedImages.isNotEmpty ? _capturedImages.last : _capturedImagePath;
   List<String> get capturedImages => _capturedImages;
   int get currentGalleryIndex => _currentGalleryIndex;
   bool get showDoneToolbar => _showDoneToolbar;
@@ -88,8 +90,16 @@ class PhotoboothFlowState extends ChangeNotifier {
     }
   }
 
-  // Avvia il flusso: passa da Idle a Countdown
+  // Avvia il flusso: passa da Idle a Camera (mostra fotocamera con pulsante record)
   void startFlow() {
+    _cancelTimers();
+    _state = PhotoboothState.camera;
+    _introActive = true;
+    notifyListeners();
+  }
+
+  // Avvia il countdown dopo che l'utente ha premuto il pulsante record
+  void startCountdown() {
     _cancelTimers();
     _state = PhotoboothState.countdown;
     _countdownValue = AppDurations.countdownStart;
@@ -159,21 +169,9 @@ class PhotoboothFlowState extends ChangeNotifier {
   // Avvia lo scatto di un'altra foto
   void takeAnotherPhoto() {
     _cancelTimers();
-    _state = PhotoboothState.countdown;
-    _countdownValue = AppDurations.countdownStart;
+    _state = PhotoboothState.camera;
     _introActive = true;
     notifyListeners();
-
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _introActive = false;
-      if (_countdownValue > 1) {
-        _countdownValue--;
-        notifyListeners();
-      } else {
-        timer.cancel();
-        _triggerFlashAndCapture();
-      }
-    });
   }
 
   // Passa alla galleria finale
@@ -205,15 +203,12 @@ class PhotoboothFlowState extends ChangeNotifier {
     });
   }
 
-  // Navigazione galleria: foto precedente
+  // Navigazione galleria: foto precedente (non wrappa)
   void previousImage() {
     if (_capturedImages.isEmpty) return;
+    if (_currentGalleryIndex <= 0) return;
     _cancelTimers();
-    if (_currentGalleryIndex > 0) {
-      _currentGalleryIndex--;
-    } else {
-      _currentGalleryIndex = _capturedImages.length - 1;
-    }
+    _currentGalleryIndex--;
     notifyListeners();
 
     _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
@@ -221,21 +216,21 @@ class PhotoboothFlowState extends ChangeNotifier {
     });
   }
 
-  // Navigazione galleria: foto successiva
+  // Navigazione galleria: foto successiva (non wrappa)
   void nextImage() {
     if (_capturedImages.isEmpty) return;
+    if (_currentGalleryIndex >= _capturedImages.length - 1) return;
     _cancelTimers();
-    if (_currentGalleryIndex < _capturedImages.length - 1) {
-      _currentGalleryIndex++;
-    } else {
-      _currentGalleryIndex = 0;
-    }
+    _currentGalleryIndex++;
     notifyListeners();
 
     _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
       resetToHome();
     });
   }
+
+  bool get isFirstImage => _currentGalleryIndex <= 0;
+  bool get isLastImage => _currentGalleryIndex >= _capturedImages.length - 1;
 
   // Gestisce il click sul pulsante Fine nella galleria
   void handleDoneClick() {

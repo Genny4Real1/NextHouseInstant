@@ -18,7 +18,7 @@ class GalleryButton extends StatelessWidget {
     required this.action,
     this.onPressed,
     this.iconSize = 32.0,
-    this.width = 50.0,
+    this.width = 80.0,
     this.disabled = false,
   });
 
@@ -64,7 +64,10 @@ class GalleryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget icon = Icon(_icon, color: _iconColor, size: iconSize);
-    final Widget label = Text(_label, style: AppTextStyles.galleryToolbarLabel);
+    final Widget label = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(_label, style: AppTextStyles.galleryToolbarLabel),
+    );
 
     final Widget body = Column(
       mainAxisSize: MainAxisSize.min,
