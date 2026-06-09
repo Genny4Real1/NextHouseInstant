@@ -10,6 +10,8 @@ class PhotoSelectionShareScreen extends StatelessWidget {
   final Function(String) onToggleSelection;
   final VoidCallback onCancel;
   final VoidCallback onDone;
+  final bool isUploading;
+  final String? uploadError;
 
   const PhotoSelectionShareScreen({
     super.key,
@@ -18,6 +20,8 @@ class PhotoSelectionShareScreen extends StatelessWidget {
     required this.onToggleSelection,
     required this.onCancel,
     required this.onDone,
+    required this.isUploading,
+    required this.uploadError,
   });
 
   @override
@@ -45,9 +49,9 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 4.0),
-                const Text(
-                  'Seleziona le immagini che desideri salvare',
-                  style: TextStyle(
+                Text(
+                  'Seleziona le immagini che desideri salvare (${selectedImages.length} di ${capturedImages.length} selezionate)',
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     color: AppColors.textSecondary,
                     fontSize: 16.0,
@@ -55,6 +59,57 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
+
+                // Messaggio di Errore se presente
+                if (uploadError != null) ...[
+                  const SizedBox(height: AppSpacing.s16),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s48),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: 12.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withAlpha(30),
+                      border: Border.all(color: AppColors.error.withAlpha(120), width: 1.5),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline_rounded, color: AppColors.error),
+                        const SizedBox(width: 12.0),
+                        Expanded(
+                          child: Text(
+                            uploadError!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12.0),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors.error,
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
+                          onPressed: onDone,
+                          child: const Text(
+                            'Riprova',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
                 const SizedBox(height: AppSpacing.s24),
 
                 // Lista orizzontale di foto
@@ -72,7 +127,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                           final bool isSelected = selectedImages.contains(path);
 
                           return GestureDetector(
-                            onTap: () => onToggleSelection(path),
+                            onTap: isUploading ? null : () => onToggleSelection(path),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s12),
@@ -164,13 +219,13 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.black,
-                        backgroundColor: hasSelection ? Colors.white : Colors.white.withAlpha(50),
-                        elevation: hasSelection ? 4.0 : 0.0,
+                        backgroundColor: (hasSelection && !isUploading) ? Colors.white : Colors.white.withAlpha(50),
+                        elevation: (hasSelection && !isUploading) ? 4.0 : 0.0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(28.0),
                         ),
                       ),
-                      onPressed: hasSelection ? onDone : null,
+                      onPressed: (hasSelection && !isUploading) ? onDone : null,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -180,13 +235,13 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                               fontFamily: 'Inter',
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
-                              color: hasSelection ? Colors.black : Colors.white.withAlpha(80),
+                              color: (hasSelection && !isUploading) ? Colors.black : Colors.white.withAlpha(80),
                             ),
                           ),
                           const SizedBox(width: AppSpacing.s8),
                           Icon(
                             Icons.arrow_forward_rounded,
-                            color: hasSelection ? Colors.black : Colors.white.withAlpha(80),
+                            color: (hasSelection && !isUploading) ? Colors.black : Colors.white.withAlpha(80),
                           ),
                         ],
                       ),
@@ -212,10 +267,64 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                     Icons.close_rounded,
                     color: Colors.white,
                   ),
-                  onPressed: onCancel,
+                  onPressed: isUploading ? null : onCancel,
                 ),
               ),
             ),
+
+            // Overlay di caricamento con sfocatura premium
+            if (isUploading)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withAlpha(160),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 32.0),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(24.0),
+                        border: Border.all(color: Colors.white.withAlpha(15), width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(80),
+                            blurRadius: 30.0,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(
+                            strokeWidth: 4.0,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.nextHouseOrange),
+                          ),
+                          SizedBox(height: 24.0),
+                          Text(
+                            "Caricamento foto...",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              color: Colors.white,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            "Creazione sessione di download",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              color: AppColors.textSecondary,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

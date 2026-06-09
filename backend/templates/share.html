@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextHouse - Condivisione Foto</title>
+    <!-- Font Google: Inter per i testi e Outfit/Saira Stencil One per i titoli -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0F172A; /* Slate Obsidian */
+            --surface-color: rgba(30, 41, 59, 0.7); /* Charcoal Gray con trasparenza */
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary-color: #F26721; /* NextHouse Orange */
+            --accent-color: #38BDF8; /* Muted Cyan */
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(242, 103, 33, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+        }
+
+        header {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2.5rem 1.5rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFF 0%, var(--primary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-badge {
+            background-color: rgba(242, 103, 33, 0.15);
+            border: 1px solid rgba(242, 103, 33, 0.3);
+            color: var(--primary-color);
+            padding: 0.25rem 0.6rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        main {
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 1.5rem 4rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .code-display {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.4rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+
+        /* Bottone ZIP Principale */
+        .btn-download-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #d45013 100%);
+            color: white;
+            border: none;
+            padding: 1.1rem 2.2rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(242, 103, 33, 0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 3.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-download-all:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(242, 103, 33, 0.6);
+            background: linear-gradient(135deg, #ff7b39 0%, var(--primary-color) 100%);
+        }
+
+        .btn-download-all:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-download-all svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Galleria Immagini */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            }
+        }
+
+        .gallery-item {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            aspect-ratio: 4/3;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px);
+            border-color: rgba(242, 103, 33, 0.3);
+            box-shadow: 0 30px 50px -15px rgba(242, 103, 33, 0.15);
+        }
+
+        .gallery-image-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gallery-item:hover .gallery-image {
+            transform: scale(1.05);
+        }
+
+        /* Overlay con bottone Download Singolo */
+        .item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .item-overlay {
+            opacity: 1;
+        }
+
+        .btn-download-single {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+
+        .btn-download-single:hover {
+            background: white;
+            color: black;
+            border-color: white;
+            transform: scale(1.03);
+        }
+
+        .btn-download-single svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 768px) {
+            .item-overlay {
+                opacity: 1;
+                background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.4) 50%, transparent 100%);
+            }
+            .btn-download-single {
+                background: rgba(255, 255, 255, 0.2);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+            header {
+                padding: 1.5rem 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .btn-download-all {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 2rem;
+            }
+        }
+
+        footer {
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: rgba(10, 15, 30, 0.5);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <span class="logo-text">NEXTHOUSE</span>
+            <span class="logo-badge">Instant</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero-section">
+            <h1>Le tue foto sono pronte!</h1>
+            <p class="subtitle">Ecco i tuoi ricordi catturati dal nostro photobooth. Puoi scaricarli tutti in un colpo solo o salvare le singole immagini sul tuo dispositivo.</p>
+            <div class="code-display">Sessione: {{ session_id }}</div>
+        </div>
+
+        <a href="{{ download_zip_url }}" class="btn-download-all">
+            <!-- Icona Download ZIP -->
+            <svg viewBox="0 0 24 24">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+            </svg>
+            Scarica Tutte (ZIP)
+        </a>
+
+        <div class="gallery-grid">
+            {% for image_url in images %}
+            <div class="gallery-item">
+                <div class="gallery-image-wrapper">
+                    <img src="{{ image_url }}" alt="Foto ricordo" class="gallery-image" loading="lazy">
+                    <div class="item-overlay">
+                        <a href="{{ image_url }}" download class="btn-download-single">
+                            <!-- Icona Salva immagine -->
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+                            </svg>
+                            Salva Foto
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 <a href="https://nexthouse.it" target="_blank">NextHouse</a>. Tutti i diritti riservati.</p>
+    </footer>
+</body>
+</html>

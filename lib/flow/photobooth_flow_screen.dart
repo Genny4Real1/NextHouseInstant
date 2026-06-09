@@ -103,13 +103,13 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onToggleSelection: _flowState.toggleImageSelection,
           onCancel: _flowState.cancelShareSelection,
           onDone: _flowState.completeShareSelection,
+          isUploading: _flowState.isUploading,
+          uploadError: _flowState.uploadError,
         );
       case PhotoboothState.shareQr:
         return PhotoGalleryScreenShare2(
           key: const ValueKey('shareQr'),
-          countdownValue: _flowState.shareCountdownValue,
-          selectedImages: _flowState.selectedShareImages,
-          onDone: _flowState.resetToHome,
+          flowState: _flowState,
         );
     }
   }
