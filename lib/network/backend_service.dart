@@ -49,6 +49,7 @@ class BackendService {
     final url = config.getUri('/api/photos/upload');
     debugPrint('BackendService: URL di upload: $url');
     final request = http.MultipartRequest('POST', url);
+    request.headers['X-Upload-Key'] = 'nh_upload_9f3a9e22db83ec4a689cf91283d73bfe5a6f8b9d';
     
     // FastAPI expects a list under the form field name 'files'
     for (final file in files) {
@@ -100,6 +101,7 @@ class BackendService {
     final url = config.getUri('/api/photos/upload');
     debugPrint('BackendService: URL di upload: $url');
     final request = http.MultipartRequest('POST', url);
+    request.headers['X-Upload-Key'] = 'nh_upload_9f3a9e22db83ec4a689cf91283d73bfe5a6f8b9d';
     
     debugPrint('BackendService: Aggiunta file al multipart con chiave "file": ${file.path}');
     request.files.add(
@@ -175,7 +177,7 @@ class BackendService {
           uploadedCount: photoIds.length,
           totalCount: photoIds.length,
           downloadToken: 'mock_token_${DateTime.now().millisecondsSinceEpoch}',
-          downloadUrl: config.baseUrl + '/share/mock_session/download',
+          downloadUrl: '${config.baseUrl}/share/mock_session/download',
           expiresAt: mockExpiration,
           errorMessage: 'Backend returned 404 - using simulated LAN download session state.',
         );

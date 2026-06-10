@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
-import 'package:http/http.dart' as http;
 import '../theme/app_durations.dart';
 import '../network/backend_config.dart';
 import '../network/backend_models.dart';
@@ -515,11 +513,25 @@ class PhotoboothFlowState extends ChangeNotifier {
       final shareState = await _backendService.createDownloadSession(photoIds);
       debugPrint('PhotoboothFlowState: Risposta sessione download: $shareState');
 
-      // 3. Costruisce il downloadUrl finale
+      // 3. Costruisce il downloadUrl finale puntando alla webapp (porta 5173 anziché 8080)
       final token = shareState.downloadToken ?? '';
-      final baseUrlNormalized = _backendUrl.endsWith('/')
-          ? _backendUrl.substring(0, _backendUrl.length - 1)
-          : _backendUrl;
+      String webappUrl = _backendUrl;
+      try {
+        final uri = Uri.parse(_backendUrl);
+        if (uri.port == 8080) {
+          webappUrl = uri.replace(port: 5173).toString();
+        } else if (webappUrl.contains(':8080')) {
+          webappUrl = webappUrl.replaceAll(':8080', ':5173');
+        }
+      } catch (e) {
+        if (webappUrl.contains(':8080')) {
+          webappUrl = webappUrl.replaceAll(':8080', ':5173');
+        }
+      }
+
+      final baseUrlNormalized = webappUrl.endsWith('/')
+          ? webappUrl.substring(0, webappUrl.length - 1)
+          : webappUrl;
       
       final String finalDownloadUrl = '$baseUrlNormalized/download/$token';
 

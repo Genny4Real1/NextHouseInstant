@@ -1,7 +1,7 @@
 class BackendConfig {
   /// Centralized base URL configuration for local LAN debugging.
   /// Easily editable by hand. Avoid using localhost to support real tablet testing.
-  static const String defaultBaseUrl = 'http://192.168.1.62:8080';
+  static const String defaultBaseUrl = 'http://192.168.36.151:8080';
 
   final String baseUrl;
   final Duration timeout;

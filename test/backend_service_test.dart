@@ -189,6 +189,7 @@ void main() {
         expect(request.method, 'POST');
         expect(request.url.path, '/api/photos/upload');
         expect(request.headers['content-type'], contains('multipart/form-data'));
+        expect(request.headers['X-Upload-Key'], 'nh_upload_9f3a9e22db83ec4a689cf91283d73bfe5a6f8b9d');
         
         final responsePayload = {
           'session_id': 'abc_session',
@@ -220,6 +221,7 @@ void main() {
         expect(request.method, 'POST');
         expect(request.url.path, '/api/photos/upload');
         expect(request.headers['content-type'], contains('multipart/form-data'));
+        expect(request.headers['X-Upload-Key'], 'nh_upload_9f3a9e22db83ec4a689cf91283d73bfe5a6f8b9d');
         
         final responsePayload = {
           'id': '123',

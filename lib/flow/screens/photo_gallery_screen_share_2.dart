@@ -1,4 +1,6 @@
+import 'dart:io' show Platform, Process;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
@@ -71,8 +73,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
         return _buildErrorState(context, state);
       case ShareSessionStatus.ready:
       case ShareSessionStatus.idle:
-      default:
-        return _buildReadyState(state, countdownValue, progress);
+        return _buildReadyState(context, state, countdownValue, progress);
     }
   }
 
@@ -241,7 +242,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
     );
   }
 
-  Widget _buildReadyState(ShareSessionState state, int countdownValue, double progress) {
+  Widget _buildReadyState(BuildContext context, ShareSessionState state, int countdownValue, double progress) {
     final String shareUrl = state.downloadUrl ?? flowState.shareUrl ?? '';
     final String token = state.downloadToken ?? (shareUrl.isNotEmpty ? shareUrl.split('/').last : '------');
 
@@ -428,29 +429,87 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.s32),
 
-        // Bottone Fatto / Chiudi
-        SizedBox(
-          width: 180.0,
-          height: 56.0,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.black,
-              backgroundColor: Colors.white,
-              elevation: 2.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28.0),
+        // Bottoni di controllo
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 180.0,
+              height: 56.0,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  elevation: 2.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28.0),
+                  ),
+                ),
+                onPressed: flowState.resetToHome,
+                child: const Text(
+                  'Fatto',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
-            onPressed: flowState.resetToHome,
-            child: const Text(
-              'Fatto',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
+            if (shareUrl.isNotEmpty) ...[
+              const SizedBox(width: 20.0),
+              SizedBox(
+                width: 220.0,
+                height: 56.0,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.primary,
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28.0),
+                    ),
+                  ),
+                  icon: const Icon(Icons.open_in_browser_rounded),
+                  label: const Text(
+                    'Apri / Copia Link',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () async {
+                    // Copia negli appunti
+                    await Clipboard.setData(ClipboardData(text: shareUrl));
+                    
+                    // Mostra feedback visivo
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Link copiato negli appunti: $shareUrl'),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
+
+                    // Tenta l'apertura se su PC
+                    try {
+                      if (Platform.isWindows) {
+                        await Process.run('explorer', [shareUrl]);
+                      } else if (Platform.isMacOS) {
+                        await Process.run('open', [shareUrl]);
+                      } else if (Platform.isLinux) {
+                        await Process.run('xdg-open', [shareUrl]);
+                      }
+                    } catch (e) {
+                      debugPrint('Impossibile aprire il browser direttamente: $e');
+                    }
+                  },
+                ),
               ),
-            ),
-          ),
+            ],
+          ],
         ),
       ],
     );
