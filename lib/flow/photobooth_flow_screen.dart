@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'photobooth_flow_state.dart';
+import '../services/kiosk_service.dart';
 import '../theme/app_durations.dart';
 import 'screens/idle_screen.dart';
 import 'screens/countdown_screen.dart';
@@ -26,6 +27,11 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
     _flowState = PhotoboothFlowState();
     // Avvia l'inizializzazione asincrona della fotocamera reale all'avvio del chiosco
     _flowState.initializeCamera();
+
+    // Avvia la modalità Kiosk protetta su Android al completamento del layout
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      KioskService.startKioskMode();
+    });
   }
 
   @override
