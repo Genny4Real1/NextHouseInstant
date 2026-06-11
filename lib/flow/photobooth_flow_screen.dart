@@ -8,6 +8,7 @@ import 'screens/capture_screen.dart';
 import 'screens/processing_screen.dart';
 import 'screens/ask_another_screen.dart';
 import 'screens/result_screen.dart';
+import 'screens/edit_screen.dart';
 import 'screens/photo_selection_share_screen.dart';
 import 'screens/photo_gallery_screen_share_2.dart';
 
@@ -94,12 +95,29 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onDone: _flowState.handleDoneClick,
           onDelete: _flowState.deletePhotos,
           onShare: _flowState.startShareFlow,
+          onEdit: _flowState.enterEditMode,
           showDoneToolbar: _flowState.showDoneToolbar,
           capturedImages: _flowState.capturedImages,
           currentGalleryIndex: _flowState.currentGalleryIndex,
           onPrevious: _flowState.previousImage,
           onNext: _flowState.nextImage,
           onPageChanged: _flowState.setGalleryIndex,
+        );
+      case PhotoboothState.edit:
+        return EditScreen(
+          key: ValueKey(_flowState.capturedImages[_flowState.currentGalleryIndex]),
+          imagePath: _flowState.capturedImages[_flowState.currentGalleryIndex],
+          capturedImages: _flowState.capturedImages,
+          currentGalleryIndex: _flowState.currentGalleryIndex,
+          onPreviousImage: _flowState.previousImage,
+          onNextImage: _flowState.nextImage,
+          baseUrl: _flowState.backendUrl,
+          onSave: (newPath) {
+            _flowState.exitEditMode(save: true, editedImagePath: newPath);
+          },
+          onCancel: () {
+            _flowState.exitEditMode(save: false);
+          },
         );
       case PhotoboothState.shareSelection:
         return PhotoSelectionShareScreen(

@@ -14,6 +14,7 @@ enum PhotoboothState {
   processing,
   askAnother,
   result,
+  edit,
   shareSelection,
   shareQr,
 }
@@ -79,6 +80,8 @@ class PhotoboothFlowState extends ChangeNotifier {
   bool get isUploading => _isUploading;
   String? get uploadError => _uploadError;
   String? get shareUrl => _shareUrl;
+  String get backendUrl => _backendUrl.trim().replaceAll(' ', '');
+
 
   // Inizializza la fotocamera (preferendo la camera frontale per il photobooth)
   // Inizializza la fotocamera con un meccanismo di fallback a cascata per evitare crash su hardware non supportato.
@@ -374,6 +377,41 @@ class PhotoboothFlowState extends ChangeNotifier {
     );
     _state = PhotoboothState.shareSelection;
     notifyListeners();
+  }
+
+  // Entra in modalità di modifica (Edit) per la foto corrente
+  void enterEditMode() {
+    if (_capturedImages.isEmpty) return;
+    _cancelTimers(); // Disattiva l'auto-reset della galleria durante la modifica attiva
+    _state = PhotoboothState.edit;
+    notifyListeners();
+  }
+
+  // Esce dalla modalità di modifica salvando o scartando i cambiamenti
+  void exitEditMode({bool save = false, String? editedImagePath}) {
+    _cancelTimers();
+    if (save && editedImagePath != null && _capturedImages.isNotEmpty) {
+      final oldPath = _capturedImages[_currentGalleryIndex];
+      // Elimina fisicamente la vecchia versione modificata o originale se diversa per evitare orfani
+      try {
+        final oldFile = File(oldPath);
+        if (oldFile.existsSync()) {
+          oldFile.deleteSync();
+        }
+      } catch (e) {
+        debugPrint('Errore durante la cancellazione del vecchio file modificato: $e');
+      }
+
+      _capturedImages[_currentGalleryIndex] = editedImagePath;
+    }
+    
+    _state = PhotoboothState.result;
+    notifyListeners();
+
+    // Riavvia il timer di auto-reset per inattività nella galleria
+    _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
+      resetToHome();
+    });
   }
 
   // Configura il backend base URL in modo modificabile

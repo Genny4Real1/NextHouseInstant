@@ -209,8 +209,31 @@ class BackendService {
     }
   }
 
+  /// Retrieves the list of available stickers from the backend.
+  Future<List<StickerItem>> fetchStickers() async {
+    final url = config.getUri('/api/stickers');
+    try {
+      final response = await _client.get(url).timeout(config.timeout);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data
+            .map((json) => StickerItem.fromJson(json as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw HttpException(
+          'Failed to fetch stickers: Status ${response.statusCode}',
+          uri: url,
+        );
+      }
+    } catch (e) {
+      if (e is HttpException) rethrow;
+      throw HttpException('Network or request error: $e', uri: url);
+    }
+  }
+
   /// Closes the underlying client.
   void dispose() {
     _client.close();
   }
 }
+

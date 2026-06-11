@@ -148,3 +148,33 @@ class ShareSessionState {
     return 'ShareSessionState(status: $status, uploadedCount: $uploadedCount, totalCount: $totalCount, downloadToken: $downloadToken, downloadUrl: $downloadUrl, expiresAt: $expiresAt, errorMessage: $errorMessage)';
   }
 }
+
+class StickerItem {
+  final String id;
+  final String name;
+
+  const StickerItem({
+    required this.id,
+    required this.name,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
+
+  factory StickerItem.fromJson(Map<String, dynamic> json) {
+    return StickerItem(
+      id: json['id'].toString(),
+      name: json['name']?.toString() ?? json['id'].toString(),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'StickerItem(id: $id, name: $name)';
+  }
+}
+

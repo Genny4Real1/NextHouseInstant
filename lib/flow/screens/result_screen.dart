@@ -9,6 +9,7 @@ class ResultScreen extends StatefulWidget {
   final VoidCallback onDone;
   final VoidCallback onDelete;
   final VoidCallback onShare;
+  final VoidCallback onEdit;
   final bool showDoneToolbar;
   final List<String> capturedImages;
   final int currentGalleryIndex;
@@ -22,6 +23,7 @@ class ResultScreen extends StatefulWidget {
     required this.onDone,
     required this.onDelete,
     required this.onShare,
+    required this.onEdit,
     required this.showDoneToolbar,
     required this.capturedImages,
     required this.currentGalleryIndex,
@@ -203,29 +205,28 @@ class _ResultScreenState extends State<ResultScreen> {
                       : Container(
                           key: const ValueKey('toolbar_view'),
                           width: 600.0,
-                          height: 72.0,
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s32),
+                          height: 140.0,
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _buildDisabledToolbarButton(
-                                icon: Icons.edit_rounded,
+                              _buildActiveToolbarButton(
+                                assetPath: 'assets/images/Instant_Gallery_Edit.png',
                                 label: 'Edit',
+                                onPressed: widget.onEdit,
                               ),
                               _buildActiveToolbarButton(
-                                icon: Icons.ios_share_rounded,
+                                assetPath: 'assets/images/Instant_Galllery_Share.png',
                                 label: 'Share',
                                 onPressed: widget.onShare,
-                                iconColor: AppColors.primary,
                               ),
                               _buildActiveToolbarButton(
-                                icon: Icons.delete_outline_rounded,
+                                assetPath: 'assets/images/Instant_Gallery_Delete.png',
                                 label: 'Delete',
                                 onPressed: widget.onDelete,
-                                iconColor: AppColors.error,
                               ),
                               _buildDisabledToolbarButton(
-                                icon: Icons.print_rounded,
+                                assetPath: 'assets/images/Instant_Gallery_Print.png',
                                 label: 'Print',
                               ),
                             ],
@@ -247,9 +248,11 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                   child: IconButton(
                     iconSize: 40.0,
-                    icon: const Icon(
-                      Icons.chevron_left_rounded,
-                      color: Colors.white,
+                    icon: Image.asset(
+                      'assets/images/Instant_Gallery_LeftNavigation.png',
+                      width: 40.0,
+                      height: 40.0,
+                      fit: BoxFit.contain,
                     ),
                     onPressed: widget.onPrevious,
                   ),
@@ -267,9 +270,11 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                   child: IconButton(
                     iconSize: 40.0,
-                    icon: const Icon(
-                      Icons.chevron_right_rounded,
-                      color: Colors.white,
+                    icon: Image.asset(
+                      'assets/images/Instant_Gallery_RightNavigation.png',
+                      width: 40.0,
+                      height: 40.0,
+                      fit: BoxFit.contain,
                     ),
                     onPressed: widget.onNext,
                   ),
@@ -302,39 +307,24 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Widget _buildDisabledToolbarButton({
-    required IconData icon,
+    required String assetPath,
     required String label,
   }) {
     return Opacity(
       opacity: 0.4, // Mostra i pulsanti chiaramente disabilitati/non cliccabili
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 32.0,
-          ),
-          const SizedBox(height: 4.0),
-          Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              color: Colors.white,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+      child: Image.asset(
+        assetPath,
+        width: 120.0,
+        height: 120.0,
+        fit: BoxFit.contain,
       ),
     );
   }
 
   Widget _buildActiveToolbarButton({
-    required IconData icon,
+    required String assetPath,
     required String label,
     required VoidCallback onPressed,
-    Color iconColor = Colors.white,
   }) {
     return Material(
       color: Colors.transparent,
@@ -342,26 +332,12 @@ class _ResultScreenState extends State<ResultScreen> {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(16.0),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 32.0,
-              ),
-              const SizedBox(height: 4.0),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  color: Colors.white,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+          child: Image.asset(
+            assetPath,
+            width: 120.0,
+            height: 120.0,
+            fit: BoxFit.contain,
           ),
         ),
       ),

@@ -244,5 +244,47 @@ void main() {
 
       tempDir.deleteSync(recursive: true);
     });
+
+    test('fetchStickers returns a list of stickers when status is 200', () async {
+      final mockClient = MockClient((request) async {
+        expect(request.method, 'GET');
+        expect(request.url.path, '/api/stickers');
+        
+        final responsePayload = [
+          {'id': 'nexthouse_logo', 'name': 'NextHouse Logo'},
+          {'id': 'another_sticker', 'name': 'Another Sticker'}
+        ];
+        return http.Response(jsonEncode(responsePayload), 200);
+      });
+
+      final service = BackendService(
+        config: const BackendConfig(baseUrl: 'http://localhost:8080'),
+        client: mockClient,
+      );
+
+      final response = await service.fetchStickers();
+      expect(response.length, 2);
+      expect(response[0].id, 'nexthouse_logo');
+      expect(response[0].name, 'NextHouse Logo');
+      expect(response[1].id, 'another_sticker');
+      expect(response[1].name, 'Another Sticker');
+    });
+
+    test('fetchStickers throws HttpException when status is not 200', () async {
+      final mockClient = MockClient((request) async {
+        return http.Response('Internal Server Error', 500);
+      });
+
+      final service = BackendService(
+        config: const BackendConfig(baseUrl: 'http://localhost:8080'),
+        client: mockClient,
+      );
+
+      expect(
+        () async => await service.fetchStickers(),
+        throwsA(isA<HttpException>()),
+      );
+    });
   });
 }
+

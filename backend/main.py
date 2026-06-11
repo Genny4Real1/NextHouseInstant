@@ -162,3 +162,32 @@ async def download_all_zip(session_id: str):
         media_type="application/x-zip-compressed",
         filename=zip_filename
     )
+
+
+@app.get("/api/stickers")
+async def get_stickers():
+    """
+    Restituisce la lista di tutti gli sticker disponibili sul server.
+    """
+    # Per ora restituiamo l'unico sticker statico che abbiamo: nexthouse_logo
+    return [
+        {"id": "nexthouse_logo", "name": "NextHouse Logo"}
+    ]
+
+
+@app.get("/api/stickers/{sticker_id}/image")
+async def get_sticker_image(sticker_id: str):
+    """
+    Restituisce il file immagine dello sticker richiesto.
+    """
+    # Cerca il file con estensione .png o .jpg nella directory static/stickers
+    # Supporta sia l'avvio dalla cartella root che dalla cartella backend/
+    file_path = f"backend/static/stickers/{sticker_id}.png"
+    if not os.path.exists(file_path):
+        file_path = f"static/stickers/{sticker_id}.png"
+        
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Sticker non trovato.")
+        
+    return FileResponse(file_path)
+
