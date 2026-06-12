@@ -39,6 +39,7 @@ dependencies:
   http: ^1.2.2
   http_parser: ^4.1.2
   flutter_svg: ^2.3.0
+  video_player: ^2.11.1
 
 dev_dependencies:
   flutter_test:

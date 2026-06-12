@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
 import '../theme/app_durations.dart';
@@ -9,7 +10,7 @@ import '../network/backend_service.dart';
 
 enum PhotoboothState {
   idle,
-  countdown,
+  countdown, // Schermata camera (anteprima e countdown)
   captureFeedback,
   processing,
   askAnother,
@@ -32,6 +33,10 @@ class PhotoboothFlowState extends ChangeNotifier {
   final List<String> _capturedImages = [];
   int _currentGalleryIndex = 0;
   bool _showDoneToolbar = false;
+
+  // Nuovi stati per i filtri pre-scatto
+  String? _activeFilter; // null (nessuno/originale), grayscale, sepia, cool, warm
+  bool _isCountingDown = false; // Indica se il countdown per lo scatto è attivo
 
   // Nuovo stato di condivisione integrato
   String _backendUrl = BackendConfig.defaultBaseUrl;
@@ -61,6 +66,15 @@ class PhotoboothFlowState extends ChangeNotifier {
   List<String> get capturedImages => _capturedImages;
   int get currentGalleryIndex => _currentGalleryIndex;
   bool get showDoneToolbar => _showDoneToolbar;
+
+  // Getters/Setters per filtri e countdown manuale
+  String? get activeFilter => _activeFilter;
+  bool get isCountingDown => _isCountingDown;
+
+  void setActiveFilter(String? filter) {
+    _activeFilter = filter;
+    notifyListeners();
+  }
 
   // Ritorna le foto selezionate ricavandole dal nuovo modello di sessione se valorizzato,
   // altrimenti fa fallback sul Set legacy per preservare la compatibilità.
@@ -165,11 +179,21 @@ class PhotoboothFlowState extends ChangeNotifier {
     }
   }
 
-  // Avvia il flusso: passa da Idle a Countdown
+  // Avvia il flusso: passa da Idle alla schermata Camera in modalità Anteprima (nessun countdown automatico)
   void startFlow() {
     _cancelTimers();
     resetShareFlow();
+    _activeFilter = null; // Resetta i filtri all'avvio
+    _isCountingDown = false;
     _state = PhotoboothState.countdown;
+    _countdownValue = AppDurations.countdownStart;
+    notifyListeners();
+  }
+
+  // Avvia manualmente il countdown per scattare la foto
+  void startCountdown() {
+    if (_isCountingDown) return;
+    _isCountingDown = true;
     _countdownValue = AppDurations.countdownStart;
     notifyListeners();
 
@@ -187,6 +211,7 @@ class PhotoboothFlowState extends ChangeNotifier {
   // Scatto ed acquisizione feedback reale
   Future<void> _triggerCapture() async {
     _cancelTimers();
+    _isCountingDown = false;
     _state = PhotoboothState.captureFeedback;
     notifyListeners();
 
@@ -206,13 +231,33 @@ class PhotoboothFlowState extends ChangeNotifier {
     });
   }
 
-  // Finta elaborazione della foto
-  void _startProcessing() {
+  // Elaborazione reale del filtro + finta attesa
+  Future<void> _startProcessing() async {
     _cancelTimers();
     _state = PhotoboothState.processing;
     notifyListeners();
 
-    _autoResetTimer = Timer(AppDurations.processing, () {
+    final stopwatch = Stopwatch()..start();
+
+    // Applica il filtro in-memory se selezionato
+    if (_activeFilter != null && _capturedImagePath != null) {
+      debugPrint('PhotoboothFlowState: Applicazione filtro $_activeFilter al file $_capturedImagePath');
+      final matrix = _getColorMatrixForFilter(_activeFilter);
+      final filteredPath = await _applyFilterToImageFile(_capturedImagePath!, matrix);
+      _capturedImagePath = filteredPath;
+      if (_capturedImages.isNotEmpty) {
+        _capturedImages[_capturedImages.length - 1] = filteredPath;
+      }
+      notifyListeners();
+    }
+
+    stopwatch.stop();
+    // Calcola il tempo rimanente rispetto ai 2.5 secondi finti di processing
+    final elapsed = stopwatch.elapsed;
+    final remaining = AppDurations.processing - elapsed;
+    final delay = remaining.isNegative ? Duration.zero : remaining;
+
+    _autoResetTimer = Timer(delay, () {
       _askAnother();
     });
   }
@@ -223,22 +268,106 @@ class PhotoboothFlowState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Avvia lo scatto di un'altra foto
+  // Avvia lo scatto di un'altra foto: torna in anteprima per far cambiare filtri
   void takeAnotherPhoto() {
     _cancelTimers();
+    _activeFilter = null; // Resetta filtri per il prossimo scatto
+    _isCountingDown = false;
     _state = PhotoboothState.countdown;
     _countdownValue = AppDurations.countdownStart;
     notifyListeners();
+  }
 
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdownValue > 1) {
-        _countdownValue--;
-        notifyListeners();
-      } else {
-        timer.cancel();
-        _triggerCapture();
+  // Helper per applicare il ColorFilter della matrice all'immagine su disco in-memory
+  Future<String> _applyFilterToImageFile(String inputPath, List<double> matrix) async {
+    try {
+      final File file = File(inputPath);
+      if (!await file.exists()) {
+        return inputPath;
       }
-    });
+      final Uint8List bytes = await file.readAsBytes();
+
+      // Decode image
+      final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+      final ui.FrameInfo frameInfo = await codec.getNextFrame();
+      final ui.Image image = frameInfo.image;
+
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
+      final ui.Canvas canvas = ui.Canvas(recorder);
+
+      final ui.Paint paint = ui.Paint()
+        ..colorFilter = ui.ColorFilter.matrix(matrix);
+
+      // Disegna l'immagine sul canvas applicando la matrice di colore
+      canvas.drawImage(image, ui.Offset.zero, paint);
+
+      final ui.Picture picture = recorder.endRecording();
+      final ui.Image filteredImage = await picture.toImage(image.width, image.height);
+
+      final ByteData? byteData = await filteredImage.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        return inputPath;
+      }
+
+      final Uint8List filteredBytes = byteData.buffer.asUint8List();
+      final String directory = file.parent.path;
+      final String outputPath = '$directory/filtered_${DateTime.now().millisecondsSinceEpoch}.png';
+
+      await File(outputPath).writeAsBytes(filteredBytes, flush: true);
+
+      // Cancella file originale non filtrato
+      try {
+        await file.delete();
+      } catch (e) {
+        debugPrint('Errore cancellazione file originale: $e');
+      }
+
+      return outputPath;
+    } catch (e) {
+      debugPrint('Errore applicazione filtro in-memory: $e');
+      return inputPath;
+    }
+  }
+
+  // Ritorna le matrici dei filtri esattamente come in edit_screen.dart
+  List<double> _getColorMatrixForFilter(String? filter) {
+    switch (filter) {
+      case 'grayscale':
+        return [
+          0.2126, 0.7152, 0.0722, 0.0, 0.0,
+          0.2126, 0.7152, 0.0722, 0.0, 0.0,
+          0.2126, 0.7152, 0.0722, 0.0, 0.0,
+          0.0,    0.0,    0.0,    1.0, 0.0,
+        ];
+      case 'sepia':
+        return [
+          0.393, 0.769, 0.189, 0.0, 0.0,
+          0.349, 0.686, 0.168, 0.0, 0.0,
+          0.272, 0.534, 0.131, 0.0, 0.0,
+          0.0,   0.0,   0.0,   1.0, 0.0,
+        ];
+      case 'cool':
+        return [
+          0.9, 0.0, 0.1, 0.0, 0.0,
+          0.0, 0.9, 0.1, 0.0, 0.0,
+          0.0, 0.0, 1.2, 0.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0,
+        ];
+      case 'warm':
+        return [
+          1.2, 0.0, 0.0, 0.0, 0.0,
+          0.0, 1.0, 0.0, 0.0, 0.0,
+          0.0, 0.0, 0.8, 0.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0,
+        ];
+      default:
+        return [
+          1.0, 0.0, 0.0, 0.0, 0.0,
+          0.0, 1.0, 0.0, 0.0, 0.0,
+          0.0, 0.0, 1.0, 0.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0,
+        ];
+    }
   }
 
   // Passa alla galleria finale
@@ -652,6 +781,19 @@ class PhotoboothFlowState extends ChangeNotifier {
     _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
       resetToHome();
     });
+  }
+
+  /// Stub for registering email sharing on the backend
+  Future<bool> sendEmailShare(String email) async {
+    final String token = _shareSessionState.downloadToken ?? '';
+    debugPrint('PhotoboothFlowState: sendEmailShare stub called for session $token, email $email');
+    try {
+      final success = await _backendService.registerSessionEmail(token, email);
+      return success;
+    } catch (e) {
+      debugPrint('Errore durante la registrazione email: $e');
+      return false;
+    }
   }
 
   void _cancelTimers() {

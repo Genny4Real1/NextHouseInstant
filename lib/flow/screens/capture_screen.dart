@@ -9,10 +9,12 @@ import '../../widgets/kiosk_container.dart';
 
 class CaptureScreen extends StatefulWidget {
   final String? capturedImagePath;
+  final String? activeFilter;
 
   const CaptureScreen({
     super.key,
     this.capturedImagePath,
+    this.activeFilter,
   });
 
   @override
@@ -35,6 +37,46 @@ class _CaptureScreenState extends State<CaptureScreen> {
         }
       });
     });
+  }
+
+  List<double> _getColorMatrix(String? filter) {
+    switch (filter) {
+      case 'grayscale':
+        return [
+          0.2126, 0.7152, 0.0722, 0.0, 0.0,
+          0.2126, 0.7152, 0.0722, 0.0, 0.0,
+          0.2126, 0.7152, 0.0722, 0.0, 0.0,
+          0.0,    0.0,    0.0,    1.0, 0.0,
+        ];
+      case 'sepia':
+        return [
+          0.393, 0.769, 0.189, 0.0, 0.0,
+          0.349, 0.686, 0.168, 0.0, 0.0,
+          0.272, 0.534, 0.131, 0.0, 0.0,
+          0.0,   0.0,   0.0,   1.0, 0.0,
+        ];
+      case 'cool':
+        return [
+          0.9, 0.0, 0.1, 0.0, 0.0,
+          0.0, 0.9, 0.1, 0.0, 0.0,
+          0.0, 0.0, 1.2, 0.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0,
+        ];
+      case 'warm':
+        return [
+          1.2, 0.0, 0.0, 0.0, 0.0,
+          0.0, 1.0, 0.0, 0.0, 0.0,
+          0.0, 0.0, 0.8, 0.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0,
+        ];
+      default:
+        return [
+          1.0, 0.0, 0.0, 0.0, 0.0,
+          0.0, 1.0, 0.0, 0.0, 0.0,
+          0.0, 0.0, 1.0, 0.0, 0.0,
+          0.0, 0.0, 0.0, 1.0, 0.0,
+        ];
+    }
   }
 
   @override
@@ -67,11 +109,14 @@ class _CaptureScreenState extends State<CaptureScreen> {
                         aspectRatio: 4 / 3,
                         child: KioskContainer(
                           child: hasCapturedImage
-                              ? Image.file(
-                                  File(widget.capturedImagePath!),
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const CameraPlaceholder(showGuides: false),
+                              ? ColorFiltered(
+                                  colorFilter: ColorFilter.matrix(_getColorMatrix(widget.activeFilter)),
+                                  child: Image.file(
+                                    File(widget.capturedImagePath!),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const CameraPlaceholder(showGuides: false),
+                                  ),
                                 )
                               : const CameraPlaceholder(showGuides: false),
                         ),

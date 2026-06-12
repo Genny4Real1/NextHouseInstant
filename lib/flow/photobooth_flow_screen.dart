@@ -68,18 +68,19 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
       case PhotoboothState.countdown:
         return CountdownScreen(
           key: const ValueKey('countdown'),
-          countdownValue: _flowState.countdownValue,
-          cameraController: _flowState.cameraController,
+          flowState: _flowState,
         );
       case PhotoboothState.captureFeedback:
         return CaptureScreen(
           key: const ValueKey('capture'),
           capturedImagePath: _flowState.capturedImagePath,
+          activeFilter: _flowState.activeFilter,
         );
       case PhotoboothState.processing:
         return ProcessingScreen(
           key: const ValueKey('processing'),
           capturedImagePath: _flowState.capturedImagePath,
+          activeFilter: _flowState.activeFilter,
         );
       case PhotoboothState.askAnother:
         return AskAnotherScreen(

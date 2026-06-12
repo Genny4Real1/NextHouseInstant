@@ -1,13 +1,12 @@
-import 'dart:io' show Platform, Process;
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
 import '../photobooth_flow_state.dart';
 import '../../network/backend_models.dart';
 
-class PhotoGalleryScreenShare2 extends StatelessWidget {
+class PhotoGalleryScreenShare2 extends StatefulWidget {
   final PhotoboothFlowState flowState;
 
   const PhotoGalleryScreenShare2({
@@ -16,66 +15,304 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
   });
 
   @override
+  State<PhotoGalleryScreenShare2> createState() => _PhotoGalleryScreenShare2State();
+}
+
+class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
+  final TextEditingController _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _handleSendEmail(BuildContext context, String shareUrl) async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter your email address."),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    if (!emailRegex.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter a valid email address."),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final success = await widget.flowState.sendEmailShare(email);
+    if (!context.mounted) return;
+    if (success) {
+      _emailController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Email registered for sharing: $email"),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Unable to register email at this moment."),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final flowState = widget.flowState;
     final state = flowState.shareSessionState;
     final status = state.status;
-    final countdownValue = flowState.shareCountdownValue;
-    final double progress = countdownValue / 300.0;
+    final String shareUrl = state.downloadUrl ?? flowState.shareUrl ?? '';
+
+    // Trova l'immagine di sfondo: l'ultima foto scattata
+    final String? bgImagePath = flowState.capturedImages.isNotEmpty
+        ? flowState.capturedImages.last
+        : null;
+    final bool hasPhoto = bgImagePath != null && bgImagePath.isNotEmpty;
+
+    // Gestione stati caricamento/fallimento
+    if (status == ShareSessionStatus.uploadingPhotos ||
+        status == ShareSessionStatus.creatingDownloadSession) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: _buildLoadingState(status, state),
+        ),
+      );
+    }
+
+    if (status == ShareSessionStatus.failed) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: _buildErrorState(context, state),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Center(
-              child: SingleChildScrollView(
-                child: _buildContent(context, status, state, countdownValue, progress),
-              ),
-            ),
-
-            // Pulsante di chiusura rapida anche in alto a destra (solo se non siamo nella schermata finale con QR code)
-            if (status != ShareSessionStatus.ready)
-              Positioned(
-                top: 20.0,
-                right: 20.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(20),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    iconSize: 28.0,
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Colors.white,
-                    ),
-                    onPressed: flowState.resetToHome,
+      body: Center(
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: SizedBox(
+            width: 1280.0,
+            height: 800.0,
+            child: Stack(
+              children: [
+                // 1. FOTO SCATTATA COME SFONDO (x=34, y=0, width=1212, height=800)
+                Positioned(
+                  left: 34.0,
+                  right: 34.0,
+                  top: 0.0,
+                  bottom: 0.0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: hasPhoto
+                        ? Image.file(
+                            File(bgImagePath),
+                            fit: BoxFit.cover,
+                          )
+                        : Container(color: Colors.grey[900]),
                   ),
                 ),
-              ),
-          ],
+
+                // Overlay scuro sopra la foto per contrasto
+                Positioned(
+                  left: 34.0,
+                  right: 34.0,
+                  top: 0.0,
+                  bottom: 0.0,
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.35),
+                  ),
+                ),
+
+                // 2. CARD ARANCIONE DI CONDIVISIONE (Al centro, larghezza 598, altezza 751)
+                Center(
+                  child: Container(
+                    width: 598.0,
+                    height: 751.0,
+                    padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 30.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.nextHouseOrange,
+                      borderRadius: BorderRadius.circular(60.0),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black54,
+                          blurRadius: 30.0,
+                          offset: Offset(0, 15),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // A. QR CODE (Trasparente su sfondo arancione)
+                        Container(
+                          width: 416.0,
+                          height: 416.0,
+                          padding: const EdgeInsets.all(12.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          child: shareUrl.isNotEmpty
+                              ? QrImageView(
+                                  data: shareUrl,
+                                  version: QrVersions.auto,
+                                  gapless: false,
+                                  eyeStyle: const QrEyeStyle(
+                                    eyeShape: QrEyeShape.square,
+                                    color: Colors.black,
+                                  ),
+                                  dataModuleStyle: const QrDataModuleStyle(
+                                    dataModuleShape: QrDataModuleShape.square,
+                                    color: Colors.black,
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                )
+                              : const Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                ),
+                        ),
+
+                        // B. BOX "Scan me!"
+                        Container(
+                          width: 250.0,
+                          height: 58.0,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(29.0),
+                          ),
+                          child: const Text(
+                            'Scan me!',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.nextHouseOrange,
+                            ),
+                          ),
+                        ),
+
+                        // C. ETICHETTA "Or enter your email:"
+                        const Text(
+                          'Or enter your email:',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+
+                        // D. CAMPO DI INSERIMENTO EMAIL CON STRUTTURA INVIO
+                        Container(
+                          width: 498.0,
+                          height: 50.0,
+                          padding: const EdgeInsets.only(left: 20.0, right: 6.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _emailController,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 16.0,
+                                    color: AppColors.nextHouseOrange,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: 'your@email.com',
+                                    hintStyle: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 16.0,
+                                      color: Colors.black26,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Pulsante invio
+                              GestureDetector(
+                                onTap: () {
+                                  _handleSendEmail(context, shareUrl);
+                                },
+                                child: Container(
+                                  width: 38.0,
+                                  height: 38.0,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF4D5358), // NextHouse Black
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: SvgPicture.asset(
+                                    'assets/images/send_icon.svg',
+                                    width: 18.0,
+                                    height: 18.0,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.white,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Pulsante Chiudi in alto a destra per tornare alla home
+                Positioned(
+                  top: 20.0,
+                  right: 20.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      iconSize: 28.0,
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white,
+                      ),
+                      onPressed: flowState.resetToHome,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
-  }
-
-  Widget _buildContent(
-    BuildContext context,
-    ShareSessionStatus status,
-    ShareSessionState state,
-    int countdownValue,
-    double progress,
-  ) {
-    switch (status) {
-      case ShareSessionStatus.uploadingPhotos:
-      case ShareSessionStatus.creatingDownloadSession:
-        return _buildLoadingState(status, state);
-      case ShareSessionStatus.failed:
-        return _buildErrorState(context, state);
-      case ShareSessionStatus.ready:
-      case ShareSessionStatus.idle:
-        return _buildReadyState(context, state, countdownValue, progress);
-    }
   }
 
   Widget _buildLoadingState(ShareSessionStatus status, ShareSessionState state) {
@@ -136,7 +373,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
 
     return Container(
       width: 580.0,
-      padding: const EdgeInsets.all(AppSpacing.s32),
+      padding: const EdgeInsets.all(32.0),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(32.0),
@@ -157,7 +394,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
             color: AppColors.error,
             size: 64.0,
           ),
-          const SizedBox(height: AppSpacing.s24),
+          const SizedBox(height: 24.0),
           const Text(
             "Sharing Error",
             style: TextStyle(
@@ -168,7 +405,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.s12),
+          const SizedBox(height: 12.0),
           Text(
             errorMessage,
             style: const TextStyle(
@@ -179,11 +416,10 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.s32),
+          const SizedBox(height: 32.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Pulsante Torna alla selezione
               SizedBox(
                 height: 50.0,
                 child: OutlinedButton(
@@ -195,7 +431,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   ),
-                  onPressed: flowState.goToShareSelection,
+                  onPressed: widget.flowState.goToShareSelection,
                   child: const Text(
                     'Back to selection',
                     style: TextStyle(
@@ -206,8 +442,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: AppSpacing.s16),
-              // Pulsante Riprova
+              const SizedBox(width: 16.0),
               SizedBox(
                 height: 50.0,
                 child: ElevatedButton(
@@ -219,7 +454,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   ),
-                  onPressed: flowState.shareSelectedPhotos,
+                  onPressed: widget.flowState.shareSelectedPhotos,
                   child: const Row(
                     children: [
                       Icon(Icons.replay_rounded, size: 18.0),
@@ -240,118 +475,6 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildReadyState(BuildContext context, ShareSessionState state, int countdownValue, double progress) {
-    final String shareUrl = state.downloadUrl ?? flowState.shareUrl ?? '';
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // QR Code Container (sfondo bianco per contrasto e scansione)
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.s24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(32.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(50),
-                blurRadius: 20.0,
-                spreadRadius: 2.0,
-              ),
-            ],
-          ),
-          child: shareUrl.isNotEmpty
-              ? QrImageView(
-                  data: shareUrl,
-                  version: QrVersions.auto,
-                  size: 260.0,
-                  gapless: false,
-                  errorStateBuilder: (cxt, err) {
-                    return const SizedBox(
-                      width: 260.0,
-                      height: 260.0,
-                      child: Center(
-                        child: Text(
-                          'Error generating QR Code',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    );
-                  },
-                )
-              : const SizedBox(
-                  width: 260.0,
-                  height: 260.0,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.nextHouseOrange),
-                    ),
-                  ),
-                ),
-        ),
-        const SizedBox(height: 48.0),
-
-        // Bottoni di controllo
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 180.0,
-              height: 56.0,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  elevation: 2.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28.0),
-                  ),
-                ),
-                onPressed: flowState.resetToHome,
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 20.0),
-            SizedBox(
-              width: 240.0,
-              height: 56.0,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white60,
-                  backgroundColor: Colors.white.withAlpha(20),
-                  elevation: 0.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28.0),
-                    side: BorderSide(color: Colors.white.withAlpha(15)),
-                  ),
-                ),
-                icon: const Icon(Icons.email_outlined, color: Colors.white60),
-                label: const Text(
-                  'Send via Email',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white60,
-                  ),
-                ),
-                onPressed: null, // Non cliccabile per ora
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

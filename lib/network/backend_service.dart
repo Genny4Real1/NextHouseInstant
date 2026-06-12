@@ -231,6 +231,13 @@ class BackendService {
     }
   }
 
+  /// Stub for registering email on the backend.
+  /// (Structure prepared for future integration)
+  Future<bool> registerSessionEmail(String sessionId, String email) async {
+    debugPrint('BackendService: registerSessionEmail stub called for session $sessionId, email $email');
+    return true; 
+  }
+
   /// Closes the underlying client.
   void dispose() {
     _client.close();
