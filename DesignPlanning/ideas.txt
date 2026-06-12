@@ -1,0 +1,20 @@
+DONE add filters while the camera is active not after the photo is taken
+DONE see-trough to not block camera feed, transparency to the items above it
+DONE no processing screen, no blurring the photo
+DONE add frames function while active camera 
+add funny camera features (big face etc...), no face recognition for now
+edit name of the downloaded photo (something like 'your photo')
+share: send to email with mailgun
+	User enters email in Flutter app
+	App sends request to your backend with: user's email, photo URLs/paths, and any metadata
+	Your backend calls a free email API to send the email
+	Email with photos is sent to the user
+	
+	mailgun is best
+DONE sticker website to add stickers 
+DONE fixed on the wall, with lights installed around it
+no more printing option inside the app.
+when sharing, you can tag the photos you want to send to reception to get printed
+DONE background with something happening to catch the attention 
+connect to external camera
+ai to beautify
