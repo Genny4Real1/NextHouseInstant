@@ -39,7 +39,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.s24),
                 // Titolo della pagina
                 const Text(
-                  'Condividi le tue foto',
+                  'Share your photos',
                   style: TextStyle(
                     fontFamily: 'Inter',
                     color: Colors.white,
@@ -50,7 +50,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4.0),
                 Text(
-                  'Seleziona le immagini che desideri salvare (${selectedImages.length} di ${capturedImages.length} selezionate)',
+                  'Select the images you want to save (${selectedImages.length} of ${capturedImages.length} selected)',
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     color: AppColors.textSecondary,
@@ -97,7 +97,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                           ),
                           onPressed: onDone,
                           child: const Text(
-                            'Riprova',
+                            'Retry',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
@@ -230,7 +230,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Condividi',
+                            'Share',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 18.0,
@@ -301,7 +301,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 24.0),
                           Text(
-                            "Caricamento foto...",
+                            "Uploading photos...",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               color: Colors.white,
@@ -311,7 +311,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 8.0),
                           Text(
-                            "Creazione sessione di download",
+                            "Creating download session",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               color: AppColors.textSecondary,

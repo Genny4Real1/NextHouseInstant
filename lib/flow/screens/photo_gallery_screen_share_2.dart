@@ -33,25 +33,26 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
               ),
             ),
 
-            // Pulsante di chiusura rapida anche in alto a destra
-            Positioned(
-              top: 20.0,
-              right: 20.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(20),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  iconSize: 28.0,
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: Colors.white,
+            // Pulsante di chiusura rapida anche in alto a destra (solo se non siamo nella schermata finale con QR code)
+            if (status != ShareSessionStatus.ready)
+              Positioned(
+                top: 20.0,
+                right: 20.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(20),
+                    shape: BoxShape.circle,
                   ),
-                  onPressed: flowState.resetToHome,
+                  child: IconButton(
+                    iconSize: 28.0,
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white,
+                    ),
+                    onPressed: flowState.resetToHome,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -79,8 +80,8 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
 
   Widget _buildLoadingState(ShareSessionStatus status, ShareSessionState state) {
     final String message = status == ShareSessionStatus.uploadingPhotos
-        ? "Caricamento foto ${state.uploadedCount} di ${state.totalCount}..."
-        : "Creazione link di download...";
+        ? "Uploading photo ${state.uploadedCount} of ${state.totalCount}..."
+        : "Creating download link...";
 
     return Container(
       width: 580.0,
@@ -117,7 +118,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
           ),
           const SizedBox(height: 12.0),
           const Text(
-            "Rimani vicino al chiosco mentre completiamo l'operazione.",
+            "Stay close to the kiosk while we complete the operation.",
             style: TextStyle(
               fontFamily: 'Inter',
               color: AppColors.textSecondary,
@@ -131,7 +132,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
   }
 
   Widget _buildErrorState(BuildContext context, ShareSessionState state) {
-    final String errorMessage = state.errorMessage ?? "Impossibile collegarsi al server locale.";
+    final String errorMessage = state.errorMessage ?? "Unable to connect to the local server.";
 
     return Container(
       width: 580.0,
@@ -158,7 +159,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s24),
           const Text(
-            "Errore di Condivisione",
+            "Sharing Error",
             style: TextStyle(
               fontFamily: 'Inter',
               color: Colors.white,
@@ -196,7 +197,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
                   ),
                   onPressed: flowState.goToShareSelection,
                   child: const Text(
-                    'Torna alla selezione',
+                    'Back to selection',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 15.0,
@@ -224,7 +225,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
                       Icon(Icons.replay_rounded, size: 18.0),
                       SizedBox(width: 8.0),
                       Text(
-                        'Riprova',
+                        'Retry',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 15.0,
@@ -244,190 +245,55 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
 
   Widget _buildReadyState(BuildContext context, ShareSessionState state, int countdownValue, double progress) {
     final String shareUrl = state.downloadUrl ?? flowState.shareUrl ?? '';
-    final String token = state.downloadToken ?? (shareUrl.isNotEmpty ? shareUrl.split('/').last : '------');
-
-    // Scadenza sessione: mostriamo l'ora di scadenza se disponibile
-    String expiresText = '';
-    if (state.expiresAt != null) {
-      final localExpires = state.expiresAt!.toLocal();
-      final minutesStr = localExpires.minute < 10 ? '0${localExpires.minute}' : '${localExpires.minute}';
-      final hourStr = localExpires.hour < 10 ? '0${localExpires.hour}' : '${localExpires.hour}';
-      expiresText = "Scade alle $hourStr:$minutesStr";
-    }
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // QR Code Container (sfondo bianco per contrasto e scansione)
         Container(
-          width: 580.0,
-          padding: const EdgeInsets.all(AppSpacing.s32),
+          padding: const EdgeInsets.all(AppSpacing.s24),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(32.0),
-            border: Border.all(color: Colors.white.withAlpha(15), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(100),
-                blurRadius: 25.0,
-                offset: const Offset(0.0, 10.0),
+                color: Colors.black.withAlpha(50),
+                blurRadius: 20.0,
+                spreadRadius: 2.0,
               ),
             ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // QR Code Container (sfondo bianco per contrasto e scansione)
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.s16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(25),
-                      blurRadius: 10.0,
+          child: shareUrl.isNotEmpty
+              ? QrImageView(
+                  data: shareUrl,
+                  version: QrVersions.auto,
+                  size: 260.0,
+                  gapless: false,
+                  errorStateBuilder: (cxt, err) {
+                    return const SizedBox(
+                      width: 260.0,
+                      height: 260.0,
+                      child: Center(
+                        child: Text(
+                          'Error generating QR Code',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : const SizedBox(
+                  width: 260.0,
+                  height: 260.0,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.nextHouseOrange),
                     ),
-                  ],
+                  ),
                 ),
-                child: shareUrl.isNotEmpty
-                    ? QrImageView(
-                        data: shareUrl,
-                        version: QrVersions.auto,
-                        size: 200.0,
-                        gapless: false,
-                        errorStateBuilder: (cxt, err) {
-                          return const SizedBox(
-                            width: 200.0,
-                            height: 200.0,
-                            child: Center(
-                              child: Text(
-                                'Error generating QR Code',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : const SizedBox(
-                        width: 200.0,
-                        height: 200.0,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-              ),
-              const SizedBox(width: AppSpacing.s32),
-
-              // Testi e Istruzioni
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Inquadra il QR Code',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        color: Colors.white,
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.s8),
-                    const Text(
-                      'Scansiona con il tuo telefono per visualizzare e salvare le foto selezionate sul tuo dispositivo.',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        color: AppColors.textSecondary,
-                        fontSize: 14.0,
-                        height: 1.4,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.s16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(10),
-                        borderRadius: BorderRadius.circular(12.0),
-                        border: Border.all(color: Colors.white.withAlpha(15)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'TOKEN: $token',
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              color: AppColors.primary,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          const SizedBox(height: 4.0),
-                          Text(
-                            shareUrl,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              color: AppColors.textSecondary,
-                              fontSize: 11.0,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          if (expiresText.isNotEmpty) ...[
-                            const SizedBox(height: 4.0),
-                            Text(
-                              expiresText,
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                color: AppColors.success,
-                                fontSize: 11.0,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.s24),
-
-                    // Area Timer
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 24.0,
-                          height: 24.0,
-                          child: CircularProgressIndicator(
-                            value: progress,
-                            strokeWidth: 3.0,
-                            backgroundColor: Colors.white.withAlpha(20),
-                            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.s12),
-                        Text(
-                          'Scadenza tra $countdownValue secondi',
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            color: Colors.white,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
-        const SizedBox(height: AppSpacing.s32),
+        const SizedBox(height: 48.0),
 
         // Bottoni di controllo
         Row(
@@ -447,7 +313,7 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
                 ),
                 onPressed: flowState.resetToHome,
                 child: const Text(
-                  'Fatto',
+                  'Done',
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 18.0,
@@ -456,59 +322,33 @@ class PhotoGalleryScreenShare2 extends StatelessWidget {
                 ),
               ),
             ),
-            if (shareUrl.isNotEmpty) ...[
-              const SizedBox(width: 20.0),
-              SizedBox(
-                width: 220.0,
-                height: 56.0,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: AppColors.primary,
-                    elevation: 2.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28.0),
-                    ),
+            const SizedBox(width: 20.0),
+            SizedBox(
+              width: 240.0,
+              height: 56.0,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white60,
+                  backgroundColor: Colors.white.withAlpha(20),
+                  elevation: 0.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28.0),
+                    side: BorderSide(color: Colors.white.withAlpha(15)),
                   ),
-                  icon: const Icon(Icons.open_in_browser_rounded),
-                  label: const Text(
-                    'Apri / Copia Link',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  onPressed: () async {
-                    // Copia negli appunti
-                    await Clipboard.setData(ClipboardData(text: shareUrl));
-                    
-                    // Mostra feedback visivo
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Link copiato negli appunti: $shareUrl'),
-                          duration: const Duration(seconds: 3),
-                        ),
-                      );
-                    }
-
-                    // Tenta l'apertura se su PC
-                    try {
-                      if (Platform.isWindows) {
-                        await Process.run('explorer', [shareUrl]);
-                      } else if (Platform.isMacOS) {
-                        await Process.run('open', [shareUrl]);
-                      } else if (Platform.isLinux) {
-                        await Process.run('xdg-open', [shareUrl]);
-                      }
-                    } catch (e) {
-                      debugPrint('Impossibile aprire il browser direttamente: $e');
-                    }
-                  },
                 ),
+                icon: const Icon(Icons.email_outlined, color: Colors.white60),
+                label: const Text(
+                  'Send via Email',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white60,
+                  ),
+                ),
+                onPressed: null, // Non cliccabile per ora
               ),
-            ],
+            ),
           ],
         ),
       ],

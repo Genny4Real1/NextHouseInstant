@@ -220,7 +220,7 @@ class _EditScreenState extends State<EditScreen> {
       debugPrint("Errore caricamento sticker: $e");
       if (mounted) {
         setState(() {
-          _stickersError = "Impossibile caricare gli sticker dal server.";
+          _stickersError = "Unable to load stickers from server.";
           _isLoadingStickers = false;
         });
       }
@@ -496,7 +496,7 @@ class _EditScreenState extends State<EditScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Impossibile salvare l'immagine."),
+            content: Text("Unable to save image."),
             backgroundColor: AppColors.error,
           ),
         );
@@ -680,7 +680,7 @@ class _EditScreenState extends State<EditScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _editingTextElement != null ? "Modifica Testo" : "Aggiungi Testo",
+                  _editingTextElement != null ? "Edit Text" : "Add Text",
                   style: const TextStyle(
                     color: Colors.white,
                     fontFamily: 'Inter',
@@ -698,7 +698,7 @@ class _EditScreenState extends State<EditScreen> {
                     fontSize: 18.0,
                   ),
                   decoration: const InputDecoration(
-                    hintText: "Scrivi qualcosa...",
+                    hintText: "Write something...",
                     hintStyle: TextStyle(
                       color: Colors.white38,
                       fontFamily: 'Inter',
@@ -713,7 +713,7 @@ class _EditScreenState extends State<EditScreen> {
                 ),
                 const SizedBox(height: 20.0),
                 const Text(
-                  "Colore del testo:",
+                  "Text color:",
                   style: TextStyle(
                     color: Colors.white70,
                     fontFamily: 'Inter',
@@ -759,7 +759,7 @@ class _EditScreenState extends State<EditScreen> {
                     TextButton(
                       onPressed: _cancelTextEditing,
                       child: const Text(
-                        "Annulla",
+                        "Cancel",
                         style: TextStyle(color: Colors.white70, fontFamily: 'Inter'),
                       ),
                     ),
@@ -774,7 +774,7 @@ class _EditScreenState extends State<EditScreen> {
                       ),
                       onPressed: _applyTextEditing,
                       child: const Text(
-                        "Applica",
+                        "Apply",
                         style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -798,9 +798,19 @@ class _EditScreenState extends State<EditScreen> {
     double baseSize = element.type == ElementType.sticker ? 120.0 : 80.0;
     double contentSize = baseSize * element.scale;
     
-    // Padding per contenere i controlli (x, resize, edit) all'interno dei limiti del widget
-    double padding = 32.0;
+    // Ridimensiona i tasti sotto una certa dimensione per evitare sovrapposizioni
+    double buttonSize = 32.0;
+    if (contentSize < 100.0) {
+      buttonSize = (contentSize * 0.32).clamp(18.0, 32.0);
+    }
+    double iconSize = buttonSize * 0.6;
+    
+    // Padding per contenere i controlli (x, resize, edit) all'interno dei limiti del widget per garantire il corretto funzionamento dell'hit-testing in Flutter
+    double padding = 48.0;
     double widgetSize = contentSize + (padding * 2);
+
+    // Posiziona i tasti allontanati sui bordi esterni del quadrato arancione di selezione con un offset di 12 pixel
+    double buttonOffset = (padding - 2.0) - buttonSize - 12.0;
 
     final double left = (element.position.dx * canvasWidth) - (widgetSize / 2);
     final double top = (element.position.dy * canvasHeight) - (widgetSize / 2);
@@ -812,7 +822,7 @@ class _EditScreenState extends State<EditScreen> {
         style: TextStyle(
           color: element.color,
           fontFamily: 'Inter',
-          fontSize: 24.0,
+          fontSize: 24.0 * element.scale,
           fontWeight: FontWeight.bold,
           shadows: const [
             Shadow(
@@ -849,7 +859,7 @@ class _EditScreenState extends State<EditScreen> {
     } else {
       contentWidget = Text(
         element.content,
-        style: const TextStyle(fontSize: 60.0),
+        style: TextStyle(fontSize: 60.0 * element.scale),
       );
     }
 
@@ -878,7 +888,7 @@ class _EditScreenState extends State<EditScreen> {
 
           if (details.pointerCount >= 2) {
             newScale = (_dragBaseScale * details.scale).clamp(0.5, 4.0);
-            newRotation = _dragBaseRotation + details.rotation;
+            // La rotazione con 2 dita è stata rimossa per permettere la rotazione solo tramite pulsante dedicato
           }
 
           // Calcola il drag cumulativo basato sullo spostamento del focal point globale rispetto all'inizio del gesto
@@ -931,8 +941,8 @@ class _EditScreenState extends State<EditScreen> {
               // Pulsante CANCELLA (x rossa in alto a destra)
               if (isSelected)
                 Positioned(
-                  top: padding - 18.0,
-                  right: padding - 18.0,
+                  top: buttonOffset - 18.0,
+                  right: buttonOffset - 18.0,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
@@ -954,16 +964,29 @@ class _EditScreenState extends State<EditScreen> {
                       });
                     },
                     child: Container(
-                      width: 32.0,
-                      height: 32.0,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.close_rounded,
-                        color: Colors.white,
-                        size: 20.0,
+                      width: buttonSize + 24.0,
+                      height: buttonSize + 24.0,
+                      color: Colors.transparent,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 18.0,
+                            right: 18.0,
+                            child: Container(
+                              width: buttonSize,
+                              height: buttonSize,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.close_rounded,
+                                color: Colors.white,
+                                size: iconSize,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -972,22 +995,35 @@ class _EditScreenState extends State<EditScreen> {
               // Pulsante EDIT (arancione in basso a sinistra)
               if (isSelected && element.type == ElementType.text)
                 Positioned(
-                  bottom: padding - 18.0,
-                  left: padding - 18.0,
+                  bottom: buttonOffset - 18.0,
+                  left: buttonOffset - 18.0,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () => _startTextEditing(existingText: element),
                     child: Container(
-                      width: 32.0,
-                      height: 32.0,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF26721),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.edit_rounded,
-                        color: Colors.white,
-                        size: 20.0,
+                      width: buttonSize + 24.0,
+                      height: buttonSize + 24.0,
+                      color: Colors.transparent,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            bottom: 18.0,
+                            left: 18.0,
+                            child: Container(
+                              width: buttonSize,
+                              height: buttonSize,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFF26721),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.edit_rounded,
+                                color: Colors.white,
+                                size: iconSize,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -996,23 +1032,35 @@ class _EditScreenState extends State<EditScreen> {
               // Pulsante RIDIMENSIONAMENTO / ROTAZIONE MANUALE (blu in basso a destra)
               if (isSelected)
                 Positioned(
-                  bottom: padding - 18.0,
-                  right: padding - 18.0,
+                  bottom: buttonOffset - 18.0,
+                  right: buttonOffset - 18.0,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onPanStart: (details) {
                       _dragBaseScale = element.scale;
                       _dragBaseRotation = element.rotation;
+                      
+                      // Calcola la distanza del centro del pulsante dal centro dell'elemento
+                      final double dist = (widgetSize / 2) - (buttonOffset + buttonSize / 2);
+                      
+                      // Il centro globale del widget (Stack non ruotato)
+                      _dragStartFocalPoint = details.globalPosition - Offset(dist, dist);
                     },
                     onPanUpdate: (details) {
-                      final double deltaX = details.delta.dx * 0.01;
-                      final double deltaY = details.delta.dy * 0.02;
+                      // Vettore dal centro globale al tocco corrente
+                      final Offset currentVector = details.globalPosition - _dragStartFocalPoint;
+                      
+                      // Calcola l'angolo assoluto del tocco corrente rispetto al centro globale
+                      final double currentAngle = math.atan2(currentVector.dy, currentVector.dx);
+                      
+                      // Calcola la nuova rotazione aggiungendo la differenza dell'angolo rispetto all'inizio del drag
+                      final double newRotation = _dragBaseRotation + (currentAngle - math.pi / 4);
+                      
                       final index = _currentState.placedElements.indexWhere((el) => el.id == element.id);
                       if (index != -1) {
                         setState(() {
                           _currentState.placedElements[index] = element.copyWith(
-                            scale: (_dragBaseScale + deltaX).clamp(0.5, 4.0),
-                            rotation: _dragBaseRotation + deltaY,
+                            rotation: newRotation,
                           );
                         });
                       }
@@ -1021,16 +1069,29 @@ class _EditScreenState extends State<EditScreen> {
                       _commitState(_currentState.copy());
                     },
                     child: Container(
-                      width: 32.0,
-                      height: 32.0,
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.crop_rotate_rounded,
-                        color: Colors.white,
-                        size: 20.0,
+                      width: buttonSize + 24.0,
+                      height: buttonSize + 24.0,
+                      color: Colors.transparent,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            bottom: 18.0,
+                            right: 18.0,
+                            child: Container(
+                              width: buttonSize,
+                              height: buttonSize,
+                              decoration: const BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.crop_rotate_rounded,
+                                color: Colors.white,
+                                size: iconSize,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -1165,7 +1226,7 @@ class _EditScreenState extends State<EditScreen> {
                         ),
                         SizedBox(height: 16.0),
                         Text(
-                          "Salvataggio in corso...",
+                          "Saving...",
                           style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'Inter',
@@ -1386,23 +1447,19 @@ class _EditScreenState extends State<EditScreen> {
                 onTap: () => _onToolSelected(EditTool.doodle),
               ),
               _buildMainToolbarButton(
-                icon: Image.asset(
-                  'assets/images/instant_Edit_Text_icon.png',
-                  width: 40.0,
-                  height: 40.0,
+                icon: const Icon(
+                  Icons.text_fields_rounded,
                   color: Colors.white,
-                  fit: BoxFit.contain,
+                  size: 40.0,
                 ),
                 label: "Text",
                 onTap: () => _onToolSelected(EditTool.text),
               ),
               _buildMainToolbarButton(
-                icon: Image.asset(
-                  'assets/images/Instant_Edit_Sticker_icon.png',
-                  width: 40.0,
-                  height: 40.0,
+                icon: const Icon(
+                  Icons.sticky_note_2_rounded,
                   color: Colors.white,
-                  fit: BoxFit.contain,
+                  size: 40.0,
                 ),
                 label: "Sticker",
                 onTap: () => _onToolSelected(EditTool.sticker),
@@ -1883,7 +1940,7 @@ class _EditScreenState extends State<EditScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _stickersError ?? "Errore caricamento sticker",
+                _stickersError ?? "Error loading stickers",
                 style: const TextStyle(color: Colors.white70, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 8.0),
@@ -1897,7 +1954,7 @@ class _EditScreenState extends State<EditScreen> {
                   ),
                 ),
                 onPressed: _loadStickers,
-                child: const Text("Riprova", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
+                child: const Text("Retry", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -1911,7 +1968,7 @@ class _EditScreenState extends State<EditScreen> {
         color: Colors.black.withAlpha(220),
         child: const Center(
           child: Text(
-            "Nessuno sticker disponibile sul server.",
+            "No stickers available on the server.",
             style: TextStyle(color: Colors.white70, fontFamily: 'Inter'),
           ),
         ),

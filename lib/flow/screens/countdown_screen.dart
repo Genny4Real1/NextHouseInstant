@@ -53,7 +53,7 @@ class CountdownScreen extends StatelessWidget {
                                 : const CameraPlaceholder(showGuides: false),
                           ),
 
-                          // Silhouette stilizzata e guide disegnate sopra (senza sfondo coprente)
+                          // Guide d'angolo disegnate sopra (senza sfondo coprente e senza silhouette della persona)
                           const Positioned.fill(
                             child: CameraPlaceholder(
                               showGuides: true,

@@ -31,44 +31,6 @@ class CameraPlaceholder extends StatelessWidget {
             ),
           ),
 
-        // Silhouette stilizzata per posizionamento viso
-        if (showGuides)
-          Center(
-            child: Opacity(
-              opacity: 0.1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 130,
-                    height: 170,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColors.textPrimary,
-                        width: 2.0,
-                      ),
-                      borderRadius: const BorderRadius.all(Radius.elliptical(65, 85)),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.s16),
-                  Container(
-                    width: 260,
-                    height: 90,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColors.textPrimary,
-                        width: 2.0,
-                      ),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(80),
-                        topRight: Radius.circular(80),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
 
         // Mirini d'angolo disegnati a mano
         if (showGuides)
