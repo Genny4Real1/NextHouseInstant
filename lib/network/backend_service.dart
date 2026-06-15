@@ -38,22 +38,22 @@ class BackendService {
   /// Returns a [Map] containing the JSON response from the server:
   /// e.g. `{ "session_id": "...", "share_url": "...", "code": "...", "files": [...] }`
   Future<Map<String, dynamic>> uploadPhotos(List<File> files) async {
-    debugPrint('BackendService: uploadPhotos iniziato con ${files.length} file');
+    debugPrint('BackendService: uploadPhotos started with ${files.length} files');
     for (final file in files) {
       if (!await file.exists()) {
-        debugPrint('BackendService: Errore - file non esistente: ${file.path}');
+        debugPrint('BackendService: Error - non-existent file: ${file.path}');
         throw FileSystemException("The file to upload does not exist: ${file.path}");
       }
     }
 
     final url = config.getUri('/api/photos/upload');
-    debugPrint('BackendService: URL di upload: $url');
+    debugPrint('BackendService: Upload URL: $url');
     final request = http.MultipartRequest('POST', url);
     request.headers['X-Upload-Key'] = 'nh_upload_9f3a9e22db83ec4a689cf91283d73bfe5a6f8b9d';
     
     // FastAPI expects a list under the form field name 'files'
     for (final file in files) {
-      debugPrint('BackendService: Aggiunta file al multipart: ${file.path}');
+      debugPrint('BackendService: Adding file to multipart: ${file.path}');
       request.files.add(
         await http.MultipartFile.fromPath(
           'files',
@@ -64,24 +64,24 @@ class BackendService {
     }
 
     try {
-      debugPrint('BackendService: Invio della richiesta multipart...');
+      debugPrint('BackendService: Sending multipart request...');
       final streamedResponse = await _client.send(request).timeout(config.timeout);
-      debugPrint('BackendService: Ricevuti gli header della risposta. Status: ${streamedResponse.statusCode}');
+      debugPrint('BackendService: Response headers received. Status: ${streamedResponse.statusCode}');
       final response = await http.Response.fromStream(streamedResponse).timeout(config.timeout);
-      debugPrint('BackendService: Corpo della risposta letto interamente');
+      debugPrint('BackendService: Response body read completely');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        debugPrint('BackendService: Upload completato con successo. Body: ${response.body}');
+        debugPrint('BackendService: Upload completed successfully. Body: ${response.body}');
         return jsonDecode(response.body) as Map<String, dynamic>;
       } else {
-        debugPrint('BackendService: Errore upload. Status: ${response.statusCode}, Body: ${response.body}');
+        debugPrint('BackendService: Upload error. Status: ${response.statusCode}, Body: ${response.body}');
         throw HttpException(
           'Photo upload failed with status ${response.statusCode}: ${response.body}',
           uri: url,
         );
       }
     } catch (e, stack) {
-      debugPrint('BackendService: Eccezione durante l\'upload: $e\n$stack');
+      debugPrint('BackendService: Exception during upload: $e\n$stack');
       if (e is HttpException || e is FileSystemException) {
         rethrow;
       }
@@ -92,18 +92,18 @@ class BackendService {
   /// Uploads a single physical image file to the backend using multipart/form-data.
   /// Sends the file on the 'file' field as expected by the FastAPI singular parameter.
   Future<Map<String, dynamic>> uploadPhoto(File file) async {
-    debugPrint('BackendService: uploadPhoto iniziato per file: ${file.path}');
+    debugPrint('BackendService: uploadPhoto started for file: ${file.path}');
     if (!await file.exists()) {
-      debugPrint('BackendService: Errore - file non esistente: ${file.path}');
+      debugPrint('BackendService: Error - non-existent file: ${file.path}');
       throw FileSystemException("The file to upload does not exist: ${file.path}");
     }
 
     final url = config.getUri('/api/photos/upload');
-    debugPrint('BackendService: URL di upload: $url');
+    debugPrint('BackendService: Upload URL: $url');
     final request = http.MultipartRequest('POST', url);
     request.headers['X-Upload-Key'] = 'nh_upload_9f3a9e22db83ec4a689cf91283d73bfe5a6f8b9d';
     
-    debugPrint('BackendService: Aggiunta file al multipart con chiave "file": ${file.path}');
+    debugPrint('BackendService: Adding file to multipart with key "file": ${file.path}');
     request.files.add(
       await http.MultipartFile.fromPath(
         'file',
@@ -113,24 +113,24 @@ class BackendService {
     );
 
     try {
-      debugPrint('BackendService: Invio della richiesta multipart...');
+      debugPrint('BackendService: Sending multipart request...');
       final streamedResponse = await _client.send(request).timeout(config.timeout);
-      debugPrint('BackendService: Ricevuti gli header della risposta. Status: ${streamedResponse.statusCode}');
+      debugPrint('BackendService: Response headers received. Status: ${streamedResponse.statusCode}');
       final response = await http.Response.fromStream(streamedResponse).timeout(config.timeout);
-      debugPrint('BackendService: Corpo della risposta letto interamente');
+      debugPrint('BackendService: Response body read completely');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        debugPrint('BackendService: Upload completato con successo. Body: ${response.body}');
+        debugPrint('BackendService: Upload completed successfully. Body: ${response.body}');
         return jsonDecode(response.body) as Map<String, dynamic>;
       } else {
-        debugPrint('BackendService: Errore upload. Status: ${response.statusCode}, Body: ${response.body}');
+        debugPrint('BackendService: Upload error. Status: ${response.statusCode}, Body: ${response.body}');
         throw HttpException(
           'Photo upload failed with status ${response.statusCode}: ${response.body}',
           uri: url,
         );
       }
     } catch (e, stack) {
-      debugPrint('BackendService: Eccezione durante l\'upload: $e\n$stack');
+      debugPrint('BackendService: Exception during upload: $e\n$stack');
       if (e is HttpException || e is FileSystemException) {
         rethrow;
       }

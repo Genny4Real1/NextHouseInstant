@@ -55,7 +55,7 @@ async def upload_photos(request: Request, files: List[UploadFile] = File(...)):
     Restituisce il link per la condivisione e il codice breve.
     """
     if not files:
-        raise HTTPException(status_code=400, detail="Nessun file inviato.")
+        raise HTTPException(status_code=400, detail="No files uploaded.")
         
     session_id = generate_session_code()
     session_path = os.path.join(UPLOAD_DIR, session_id)
@@ -78,7 +78,7 @@ async def upload_photos(request: Request, files: List[UploadFile] = File(...)):
         # Pulisci in caso di errore
         if os.path.exists(session_path):
             shutil.rmtree(session_path)
-        raise HTTPException(status_code=500, detail=f"Errore durante il salvataggio dei file: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error saving files: {str(e)}")
 
     # Determina l'URL di base (configurabile tramite variabile d'ambiente BASE_URL o ricavato dalla richiesta)
     base_url = os.getenv("BASE_URL")
@@ -102,7 +102,7 @@ async def get_share_gallery(request: Request, session_id: str):
     """
     session_path = os.path.join(UPLOAD_DIR, session_id)
     if not os.path.exists(session_path) or not os.path.isdir(session_path):
-        raise HTTPException(status_code=404, detail="Sessione di condivisione non trovata.")
+        raise HTTPException(status_code=404, detail="Sharing session not found.")
         
     # Elenca solo i file immagine (esclude eventuali zip o cartelle nascoste)
     files = [
@@ -137,7 +137,7 @@ async def download_all_zip(session_id: str):
     """
     session_path = os.path.join(UPLOAD_DIR, session_id)
     if not os.path.exists(session_path) or not os.path.isdir(session_path):
-        raise HTTPException(status_code=404, detail="Sessione non trovata.")
+        raise HTTPException(status_code=404, detail="Session not found.")
         
     zip_filename = f"nexthouse_{session_id}.zip"
     zip_path = os.path.join(session_path, zip_filename)
@@ -150,7 +150,7 @@ async def download_all_zip(session_id: str):
         ]
         
         if not files:
-            raise HTTPException(status_code=400, detail="Nessuna foto disponibile per il download.")
+            raise HTTPException(status_code=400, detail="No photos available for download.")
             
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for f in files:
@@ -187,7 +187,7 @@ async def get_sticker_image(sticker_id: str):
         file_path = f"static/stickers/{sticker_id}.png"
         
     if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="Sticker non trovato.")
+        raise HTTPException(status_code=404, detail="Sticker not found.")
         
     return FileResponse(file_path)
 

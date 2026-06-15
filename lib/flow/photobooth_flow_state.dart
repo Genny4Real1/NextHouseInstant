@@ -103,7 +103,7 @@ class PhotoboothFlowState extends ChangeNotifier {
     try {
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
-        debugPrint('Nessuna fotocamera trovata.');
+        debugPrint('No cameras found.');
         return;
       }
 
@@ -123,7 +123,7 @@ class PhotoboothFlowState extends ChangeNotifier {
       // Tenta prima con la fotocamera frontale
       for (final preset in presets) {
         try {
-          debugPrint('Tentativo inizializzazione camera frontale con preset: $preset');
+          debugPrint('Attempting front camera initialization with preset: $preset');
           
           if (_cameraController != null) {
             await _cameraController!.dispose();
@@ -137,11 +137,11 @@ class PhotoboothFlowState extends ChangeNotifier {
 
           await _cameraController!.initialize();
           _isCameraInitialized = true;
-          debugPrint('Camera frontale inizializzata con successo con preset: $preset');
+          debugPrint('Front camera initialized successfully with preset: $preset');
           notifyListeners();
           return; // Successo! Esci dalla funzione.
         } catch (e) {
-          debugPrint('Inizializzazione fallita per camera frontale con preset $preset: $e');
+          debugPrint('Initialization failed for front camera with preset $preset: $e');
         }
       }
 
@@ -150,7 +150,7 @@ class PhotoboothFlowState extends ChangeNotifier {
       if (fallbackCamera.name != frontCamera.name) {
         for (final preset in presets) {
           try {
-            debugPrint('Fallback: Tentativo inizializzazione camera alternativa (${fallbackCamera.name}) con preset: $preset');
+            debugPrint('Fallback: Attempting alternative camera initialization (${fallbackCamera.name}) with preset: $preset');
             
             if (_cameraController != null) {
               await _cameraController!.dispose();
@@ -164,18 +164,18 @@ class PhotoboothFlowState extends ChangeNotifier {
 
             await _cameraController!.initialize();
             _isCameraInitialized = true;
-            debugPrint('Camera alternativa inizializzata con successo con preset: $preset');
+            debugPrint('Alternative camera initialized successfully with preset: $preset');
             notifyListeners();
             return; // Successo! Esci dalla funzione.
           } catch (e) {
-            debugPrint('Inizializzazione fallita per camera alternativa con preset $preset: $e');
+            debugPrint('Initialization failed for alternative camera with preset $preset: $e');
           }
         }
       }
 
-      debugPrint('Impossibile inizializzare qualsiasi fotocamera con i preset disponibili.');
+      debugPrint('Unable to initialize any camera with available presets.');
     } catch (e) {
-      debugPrint('Errore critico durante l\'inizializzazione della fotocamera: $e');
+      debugPrint('Critical error during camera initialization: $e');
     }
   }
 
@@ -222,7 +222,7 @@ class PhotoboothFlowState extends ChangeNotifier {
         _capturedImages.add(file.path);
         notifyListeners();
       } catch (e) {
-        debugPrint('Errore durante lo scatto: $e');
+        debugPrint('Error during capture: $e');
       }
     }
 
@@ -241,7 +241,7 @@ class PhotoboothFlowState extends ChangeNotifier {
 
     // Applica il filtro in-memory se selezionato
     if (_activeFilter != null && _capturedImagePath != null) {
-      debugPrint('PhotoboothFlowState: Applicazione filtro $_activeFilter al file $_capturedImagePath');
+      debugPrint('PhotoboothFlowState: Applying filter $_activeFilter to file $_capturedImagePath');
       final matrix = _getColorMatrixForFilter(_activeFilter);
       final filteredPath = await _applyFilterToImageFile(_capturedImagePath!, matrix);
       _capturedImagePath = filteredPath;
@@ -319,12 +319,12 @@ class PhotoboothFlowState extends ChangeNotifier {
       try {
         await file.delete();
       } catch (e) {
-        debugPrint('Errore cancellazione file originale: $e');
+        debugPrint('Error deleting original file: $e');
       }
 
       return outputPath;
     } catch (e) {
-      debugPrint('Errore applicazione filtro in-memory: $e');
+      debugPrint('Error applying filter in-memory: $e');
       return inputPath;
     }
   }
@@ -469,7 +469,7 @@ class PhotoboothFlowState extends ChangeNotifier {
         await file.delete();
       }
     } catch (e) {
-      debugPrint('Errore durante la cancellazione del file $pathToDelete: $e');
+      debugPrint('Error while deleting file $pathToDelete: $e');
     }
 
     // Rimuove la foto dalle liste interne
@@ -528,7 +528,7 @@ class PhotoboothFlowState extends ChangeNotifier {
           oldFile.deleteSync();
         }
       } catch (e) {
-        debugPrint('Errore durante la cancellazione del vecchio file modificato: $e');
+        debugPrint('Error while deleting old modified file: $e');
       }
 
       _capturedImages[_currentGalleryIndex] = editedImagePath;
@@ -583,11 +583,11 @@ class PhotoboothFlowState extends ChangeNotifier {
 
   // Condivide le foto caricate tramite upload seriale e creazione sessione
   Future<void> shareSelectedPhotos() async {
-    debugPrint('PhotoboothFlowState: shareSelectedPhotos avviato');
+    debugPrint('PhotoboothFlowState: shareSelectedPhotos started');
     // Evita chiamate parallele
     if (_shareSessionState.status == ShareSessionStatus.uploadingPhotos ||
         _shareSessionState.status == ShareSessionStatus.creatingDownloadSession) {
-      debugPrint('PhotoboothFlowState: Upload o creazione sessione già in corso. Ignoro.');
+      debugPrint('PhotoboothFlowState: Upload or session creation already in progress. Ignoring.');
       return;
     }
 
@@ -595,7 +595,7 @@ class PhotoboothFlowState extends ChangeNotifier {
         .where((item) => item.isSelected)
         .toList();
     if (selectedItems.isEmpty) {
-      debugPrint('PhotoboothFlowState: Nessuna foto selezionata');
+      debugPrint('PhotoboothFlowState: No photos selected');
       _uploadError = "No photos selected for sharing.";
       _shareSessionState = ShareSessionState(
         status: ShareSessionStatus.failed,
@@ -629,9 +629,9 @@ class PhotoboothFlowState extends ChangeNotifier {
 
         try {
           final file = File(item.localPath);
-          debugPrint('PhotoboothFlowState: Carico file singolo: ${file.path}');
+          debugPrint('PhotoboothFlowState: Uploading single file: ${file.path}');
           final response = await _backendService.uploadPhoto(file);
-          debugPrint('PhotoboothFlowState: Risposta upload singolo: $response');
+          debugPrint('PhotoboothFlowState: Single upload response: $response');
 
           final backendPhotoId =
               response['id']?.toString() ??
@@ -661,7 +661,7 @@ class PhotoboothFlowState extends ChangeNotifier {
       }
 
       // 2. Creazione della sessione di download
-      debugPrint('PhotoboothFlowState: Creazione sessione di download...');
+      debugPrint('PhotoboothFlowState: Creating download session...');
       _shareSessionState = _shareSessionState.copyWith(
         status: ShareSessionStatus.creatingDownloadSession,
       );
@@ -676,9 +676,9 @@ class PhotoboothFlowState extends ChangeNotifier {
         photoIds.add(idInt ?? i);
       }
 
-      debugPrint('PhotoboothFlowState: photoIds per la sessione: $photoIds');
+      debugPrint('PhotoboothFlowState: photoIds for session: $photoIds');
       final shareState = await _backendService.createDownloadSession(photoIds);
-      debugPrint('PhotoboothFlowState: Risposta sessione download: $shareState');
+      debugPrint('PhotoboothFlowState: Download session response: $shareState');
 
       // 3. Costruisce il downloadUrl finale puntando alla webapp (porta 5173 anziché 8080)
       final token = shareState.downloadToken ?? '';
@@ -710,7 +710,7 @@ class PhotoboothFlowState extends ChangeNotifier {
       _isUploading = false;
       _state = PhotoboothState.shareQr;
       _shareCountdownValue = 300;
-      debugPrint('PhotoboothFlowState: Condivisione completata con successo. finalDownloadUrl=$finalDownloadUrl');
+      debugPrint('PhotoboothFlowState: Sharing completed successfully. finalDownloadUrl=$finalDownloadUrl');
       notifyListeners();
 
       // Avvia timer di condivisione per QR code
@@ -724,7 +724,7 @@ class PhotoboothFlowState extends ChangeNotifier {
         }
       });
     } catch (e, stack) {
-      debugPrint('PhotoboothFlowState: Errore durante la condivisione delle foto: $e\n$stack');
+      debugPrint('PhotoboothFlowState: Error during photo sharing: $e\n$stack');
       _isUploading = false;
       _uploadError = "Unable to complete sharing: $e";
       _shareSessionState = _shareSessionState.copyWith(
@@ -791,7 +791,7 @@ class PhotoboothFlowState extends ChangeNotifier {
       final success = await _backendService.registerSessionEmail(token, email);
       return success;
     } catch (e) {
-      debugPrint('Errore durante la registrazione email: $e');
+      debugPrint('Error during email registration: $e');
       return false;
     }
   }

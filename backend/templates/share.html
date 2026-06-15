@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextHouse - Condivisione Foto</title>
+    <title>NextHouse - Photo Sharing</title>
     <!-- Font Google: Inter per i testi e Outfit/Saira Stencil One per i titoli -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -305,9 +305,9 @@
 
     <main>
         <div class="hero-section">
-            <h1>Le tue foto sono pronte!</h1>
-            <p class="subtitle">Ecco i tuoi ricordi catturati dal nostro photobooth. Puoi scaricarli tutti in un colpo solo o salvare le singole immagini sul tuo dispositivo.</p>
-            <div class="code-display">Sessione: {{ session_id }}</div>
+            <h1>Your photos are ready!</h1>
+            <p class="subtitle">Here are your memories captured by our photobooth. You can download them all at once or save individual images to your device.</p>
+            <div class="code-display">Session: {{ session_id }}</div>
         </div>
 
         <a href="{{ download_zip_url }}" class="btn-download-all">
@@ -315,21 +315,21 @@
             <svg viewBox="0 0 24 24">
                 <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
             </svg>
-            Scarica Tutte (ZIP)
+            Download All (ZIP)
         </a>
 
         <div class="gallery-grid">
             {% for image_url in images %}
             <div class="gallery-item">
                 <div class="gallery-image-wrapper">
-                    <img src="{{ image_url }}" alt="Foto ricordo" class="gallery-image" loading="lazy">
+                    <img src="{{ image_url }}" alt="Memory photo" class="gallery-image" loading="lazy">
                     <div class="item-overlay">
                         <a href="{{ image_url }}" download class="btn-download-single">
                             <!-- Icona Salva immagine -->
                             <svg viewBox="0 0 24 24">
                                 <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
                             </svg>
-                            Salva Foto
+                            Save Photo
                         </a>
                     </div>
                 </div>
@@ -339,7 +339,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 <a href="https://nexthouse.it" target="_blank">NextHouse</a>. Tutti i diritti riservati.</p>
+        <p>&copy; 2026 <a href="https://nexthouse.it" target="_blank">NextHouse</a>. All rights reserved.</p>
     </footer>
 </body>
 </html>
