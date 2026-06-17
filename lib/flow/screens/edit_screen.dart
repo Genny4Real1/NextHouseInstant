@@ -1986,7 +1986,7 @@ class _EditScreenState extends State<EditScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: _stickers!.map((sticker) {
-              final stickerImageUrl = '${widget.baseUrl}/api/stickers/${sticker.id}/image';
+              final stickerImageUrl = _backendService.config.getUri('/api/stickers/${sticker.id}/image').toString();
               return GestureDetector(
                 onTap: () => _addPlacedElement(ElementType.sticker, stickerImageUrl),
                 child: Container(

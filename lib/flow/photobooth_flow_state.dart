@@ -680,19 +680,25 @@ class PhotoboothFlowState extends ChangeNotifier {
       final shareState = await _backendService.createDownloadSession(photoIds);
       debugPrint('PhotoboothFlowState: Download session response: $shareState');
 
-      // 3. Costruisce il downloadUrl finale puntando alla webapp (porta 5173 anziché 8080)
+      // 3. Costruisce il downloadUrl finale puntando alla webapp
       final token = shareState.downloadToken ?? '';
       String webappUrl = _backendUrl;
-      try {
-        final uri = Uri.parse(_backendUrl);
-        if (uri.port == 8080) {
-          webappUrl = uri.replace(port: 5173).toString();
-        } else if (webappUrl.contains(':8080')) {
-          webappUrl = webappUrl.replaceAll(':8080', ':5173');
-        }
-      } catch (e) {
-        if (webappUrl.contains(':8080')) {
-          webappUrl = webappUrl.replaceAll(':8080', ':5173');
+      if (webappUrl.endsWith('/api')) {
+        webappUrl = webappUrl.substring(0, webappUrl.length - 4);
+      } else if (webappUrl.endsWith('/api/')) {
+        webappUrl = webappUrl.substring(0, webappUrl.length - 5);
+      } else {
+        try {
+          final uri = Uri.parse(_backendUrl);
+          if (uri.port == 8080) {
+            webappUrl = uri.replace(port: 5173).toString();
+          } else if (webappUrl.contains(':8080')) {
+            webappUrl = webappUrl.replaceAll(':8080', ':5173');
+          }
+        } catch (e) {
+          if (webappUrl.contains(':8080')) {
+            webappUrl = webappUrl.replaceAll(':8080', ':5173');
+          }
         }
       }
 

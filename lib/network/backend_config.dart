@@ -1,7 +1,7 @@
 class BackendConfig {
   /// Centralized base URL configuration for local LAN debugging.
   /// Easily editable by hand. Avoid using localhost to support real tablet testing.
-  static const String defaultBaseUrl = 'http://167.233.52.44:8080';
+  static const String defaultBaseUrl = 'https://frontend-nexthouseinstant.pages.dev/api';
 
   final String baseUrl;
   final Duration timeout;
@@ -19,8 +19,14 @@ class BackendConfig {
   Uri getUri(String path, [Map<String, dynamic>? queryParameters]) {
     final cleanPath = path.startsWith('/') ? path : '/$path';
     final base = Uri.parse(cleanedBaseUrl);
+    
+    var combinedPath = '${base.path}$cleanPath';
+    if (base.path.endsWith('/api') && cleanPath.startsWith('/api')) {
+      combinedPath = base.path + cleanPath.substring(4);
+    }
+    
     return base.replace(
-      path: '${base.path}$cleanPath'.replaceAll('//', '/'),
+      path: combinedPath.replaceAll('//', '/'),
       queryParameters: queryParameters,
     );
   }
