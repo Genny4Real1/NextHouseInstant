@@ -126,7 +126,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               horizontal: AppSpacing.s48,
             ),
             decoration: BoxDecoration(
-              color: AppColors.nextHouseOrange,
+              color: AppColors.nextHouseOrange.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(60.0),
               boxShadow: [
                 BoxShadow(

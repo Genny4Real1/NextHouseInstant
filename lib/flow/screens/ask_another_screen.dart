@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
@@ -23,23 +22,20 @@ class AskAnotherScreen extends StatelessWidget {
 
     return Stack(
       children: [
-        // Sfondo con la foto scattata sfocata
+        // Sfondo con la foto scattata (senza sfocatura)
         Positioned.fill(
-          child: ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-            child: Container(
-              color: Colors.black,
-              child: Opacity(
-                opacity: 0.7,
-                child: hasCapturedImage
-                    ? Image.file(
-                        File(capturedImagePath!),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const CameraPlaceholder(showGuides: false),
-                      )
-                    : const CameraPlaceholder(showGuides: false),
-              ),
+          child: Container(
+            color: Colors.black,
+            child: Opacity(
+              opacity: 0.8,
+              child: hasCapturedImage
+                  ? Image.file(
+                      File(capturedImagePath!),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const CameraPlaceholder(showGuides: false),
+                    )
+                  : const CameraPlaceholder(showGuides: false),
             ),
           ),
         ),
@@ -61,7 +57,7 @@ class AskAnotherScreen extends StatelessWidget {
               horizontal: AppSpacing.s48,
             ),
             decoration: BoxDecoration(
-              color: AppColors.nextHouseOrange,
+              color: AppColors.nextHouseOrange.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(40.0),
               boxShadow: [
                 BoxShadow(
