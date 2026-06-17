@@ -43,45 +43,127 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     switch (filter) {
       case 'grayscale':
         return [
-          0.2126, 0.7152, 0.0722, 0.0, 0.0,
-          0.2126, 0.7152, 0.0722, 0.0, 0.0,
-          0.2126, 0.7152, 0.0722, 0.0, 0.0,
-          0.0,    0.0,    0.0,    1.0, 0.0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0.0,
+          0.0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0.0,
+          0.0,
+          0.2126,
+          0.7152,
+          0.0722,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
         ];
       case 'sepia':
         return [
-          0.393, 0.769, 0.189, 0.0, 0.0,
-          0.349, 0.686, 0.168, 0.0, 0.0,
-          0.272, 0.534, 0.131, 0.0, 0.0,
-          0.0,   0.0,   0.0,   1.0, 0.0,
+          0.393,
+          0.769,
+          0.189,
+          0.0,
+          0.0,
+          0.349,
+          0.686,
+          0.168,
+          0.0,
+          0.0,
+          0.272,
+          0.534,
+          0.131,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
         ];
       case 'cool':
         return [
-          0.9, 0.0, 0.1, 0.0, 0.0,
-          0.0, 0.9, 0.1, 0.0, 0.0,
-          0.0, 0.0, 1.2, 0.0, 0.0,
-          0.0, 0.0, 0.0, 1.0, 0.0,
+          0.9,
+          0.0,
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.9,
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.2,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
         ];
       case 'warm':
         return [
-          1.2, 0.0, 0.0, 0.0, 0.0,
-          0.0, 1.0, 0.0, 0.0, 0.0,
-          0.0, 0.0, 0.8, 0.0, 0.0,
-          0.0, 0.0, 0.0, 1.0, 0.0,
+          1.2,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.8,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
         ];
       default:
         return [
-          1.0, 0.0, 0.0, 0.0, 0.0,
-          0.0, 1.0, 0.0, 0.0, 0.0,
-          0.0, 0.0, 1.0, 0.0, 0.0,
-          0.0, 0.0, 0.0, 1.0, 0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
         ];
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool hasCapturedImage = widget.capturedImagePath != null && widget.capturedImagePath!.isNotEmpty;
+    final bool hasCapturedImage =
+        widget.capturedImagePath != null &&
+        widget.capturedImagePath!.isNotEmpty;
 
     return Stack(
       children: [
@@ -95,7 +177,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 opacity: 0.7,
                 child: hasCapturedImage
                     ? ColorFiltered(
-                        colorFilter: ColorFilter.matrix(_getColorMatrix(widget.activeFilter)),
+                        colorFilter: ColorFilter.matrix(
+                          _getColorMatrix(widget.activeFilter),
+                        ),
                         child: Image.file(
                           File(widget.capturedImagePath!),
                           fit: BoxFit.cover,
@@ -110,11 +194,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ),
 
         // Sfondo semitrasparente
-        Positioned.fill(
-          child: Container(
-            color: Colors.black.withAlpha(50),
-          ),
-        ),
+        Positioned.fill(child: Container(color: Colors.black.withAlpha(50))),
 
         // Box arancione centrale di elaborazione
         Center(
@@ -126,7 +206,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               horizontal: AppSpacing.s48,
             ),
             decoration: BoxDecoration(
-              color: AppColors.nextHouseOrange.withValues(alpha: 0.8),
+              color: AppColors.nextHouseOrange.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(60.0),
               boxShadow: [
                 BoxShadow(
@@ -168,7 +248,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                         height: 100.0,
                         child: CircularProgressIndicator(
                           strokeWidth: 6.0,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       );
                     },

@@ -22,29 +22,16 @@ class AskAnotherScreen extends StatelessWidget {
 
     return Stack(
       children: [
-        // Sfondo con la foto scattata (senza sfocatura)
+        // Sfondo con la foto scattata (senza sfocatura e a piena luminosità)
         Positioned.fill(
-          child: Container(
-            color: Colors.black,
-            child: Opacity(
-              opacity: 0.8,
-              child: hasCapturedImage
-                  ? Image.file(
-                      File(capturedImagePath!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const CameraPlaceholder(showGuides: false),
-                    )
-                  : const CameraPlaceholder(showGuides: false),
-            ),
-          ),
-        ),
-
-        // Sfondo semitrasparente scuro per concentrare l'attenzione
-        Positioned.fill(
-          child: Container(
-            color: Colors.black.withAlpha(50),
-          ),
+          child: hasCapturedImage
+              ? Image.file(
+                  File(capturedImagePath!),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const CameraPlaceholder(showGuides: false),
+                )
+              : const CameraPlaceholder(showGuides: false),
         ),
 
         // Dialogo di richiesta al centro
@@ -57,7 +44,7 @@ class AskAnotherScreen extends StatelessWidget {
               horizontal: AppSpacing.s48,
             ),
             decoration: BoxDecoration(
-              color: AppColors.nextHouseOrange.withValues(alpha: 0.8),
+              color: AppColors.nextHouseOrange.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(40.0),
               boxShadow: [
                 BoxShadow(
