@@ -204,7 +204,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         )
                       : Container(
                           key: const ValueKey('toolbar_view'),
-                          width: 600.0,
+                          width: 450.0,
                           height: 140.0,
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                           child: Row(
@@ -224,10 +224,6 @@ class _ResultScreenState extends State<ResultScreen> {
                                 assetPath: 'assets/images/Instant_Gallery_Delete.png',
                                 label: 'Delete',
                                 onPressed: widget.onDelete,
-                              ),
-                              _buildDisabledToolbarButton(
-                                assetPath: 'assets/images/Instant_Gallery_Print.png',
-                                label: 'Print',
                               ),
                             ],
                           ),
@@ -306,20 +302,6 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  Widget _buildDisabledToolbarButton({
-    required String assetPath,
-    required String label,
-  }) {
-    return Opacity(
-      opacity: 0.4, // Mostra i pulsanti chiaramente disabilitati/non cliccabili
-      child: Image.asset(
-        assetPath,
-        width: 120.0,
-        height: 120.0,
-        fit: BoxFit.contain,
-      ),
-    );
-  }
 
   Widget _buildActiveToolbarButton({
     required String assetPath,

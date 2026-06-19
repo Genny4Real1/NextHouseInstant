@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../theme/app_colors.dart';
 import '../photobooth_flow_state.dart';
@@ -19,56 +18,6 @@ class PhotoGalleryScreenShare2 extends StatefulWidget {
 }
 
 class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
-  final TextEditingController _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  void _handleSendEmail(BuildContext context, String shareUrl) async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter your email address."),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-    if (!emailRegex.hasMatch(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter a valid email address."),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    final success = await widget.flowState.sendEmailShare(email);
-    if (!context.mounted) return;
-    if (success) {
-      _emailController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Email registered for sharing: $email"),
-          backgroundColor: AppColors.success,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Unable to register email at this moment."),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +74,7 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                         ? Image.file(
                             File(bgImagePath),
                             fit: BoxFit.cover,
-                          )
+                            )
                         : Container(color: Colors.grey[900]),
                   ),
                 ),
@@ -141,11 +90,11 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                   ),
                 ),
 
-                // 2. CARD ARANCIONE DI CONDIVISIONE (Al centro, larghezza 598, altezza 751)
+                // 2. CARD ARANCIONE DI CONDIVISIONE (Al centro, larghezza 598, altezza 610)
                 Center(
                   child: Container(
                     width: 598.0,
-                    height: 751.0,
+                    height: 610.0,
                     padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 30.0),
                     decoration: BoxDecoration(
                       color: AppColors.nextHouseOrange,
@@ -209,78 +158,6 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                               fontWeight: FontWeight.bold,
                               color: AppColors.nextHouseOrange,
                             ),
-                          ),
-                        ),
-
-                        // C. ETICHETTA "Or enter your email:"
-                        const Text(
-                          'Or enter your email:',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        // D. CAMPO DI INSERIMENTO EMAIL CON STRUTTURA INVIO
-                        Container(
-                          width: 498.0,
-                          height: 50.0,
-                          padding: const EdgeInsets.only(left: 20.0, right: 6.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _emailController,
-                                  style: const TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 16.0,
-                                    color: AppColors.nextHouseOrange,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: 'your@email.com',
-                                    hintStyle: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 16.0,
-                                      color: Colors.black26,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Pulsante invio
-                              GestureDetector(
-                                onTap: () {
-                                  _handleSendEmail(context, shareUrl);
-                                },
-                                child: Container(
-                                  width: 38.0,
-                                  height: 38.0,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF4D5358), // NextHouse Black
-                                    shape: BoxShape.circle,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: SvgPicture.asset(
-                                    'assets/images/send_icon.svg',
-                                    width: 18.0,
-                                    height: 18.0,
-                                    colorFilter: const ColorFilter.mode(
-                                      Colors.white,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ],
