@@ -273,7 +273,7 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
           ),
           const SizedBox(height: 24.0),
           const Text(
-            "Download Error",
+            "Sharing Error",
             style: TextStyle(
               fontFamily: 'Inter',
               color: Colors.white,

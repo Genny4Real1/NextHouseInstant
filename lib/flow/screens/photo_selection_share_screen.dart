@@ -39,7 +39,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.s24),
                 // Titolo della pagina
                 const Text(
-                  'Download your photos',
+                  'Share your photos',
                   style: TextStyle(
                     fontFamily: 'Inter',
                     color: Colors.white,
@@ -230,7 +230,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Download',
+                            'Share',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 18.0,

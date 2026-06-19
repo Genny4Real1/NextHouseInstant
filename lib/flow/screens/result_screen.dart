@@ -204,7 +204,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         )
                       : Container(
                           key: const ValueKey('toolbar_view'),
-                          width: 450.0,
+                          width: 500.0,
                           height: 140.0,
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                           child: Row(
@@ -217,7 +217,7 @@ class _ResultScreenState extends State<ResultScreen> {
                               ),
                               _buildActiveToolbarButton(
                                 assetPath: 'assets/images/Instant_Galllery_Share.png',
-                                label: 'Download',
+                                label: 'Share',
                                 onPressed: widget.onShare,
                               ),
                               _buildActiveToolbarButton(
