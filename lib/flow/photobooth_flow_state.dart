@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/app_durations.dart';
 import '../network/backend_config.dart';
 import '../network/backend_models.dart';
@@ -16,6 +17,7 @@ enum PhotoboothState {
   askAnother,
   result,
   edit,
+  shareTerms,
   shareSelection,
   shareQr,
 }
@@ -239,14 +241,23 @@ class PhotoboothFlowState extends ChangeNotifier {
 
     final stopwatch = Stopwatch()..start();
 
-    // Applica il filtro in-memory se selezionato
-    if (_activeFilter != null && _capturedImagePath != null) {
-      debugPrint('PhotoboothFlowState: Applying filter $_activeFilter to file $_capturedImagePath');
-      final matrix = _getColorMatrixForFilter(_activeFilter);
-      final filteredPath = await _applyFilterToImageFile(_capturedImagePath!, matrix);
-      _capturedImagePath = filteredPath;
+    if (_capturedImagePath != null) {
+      String processedPath = _capturedImagePath!;
+
+      // 1. Applica il filtro in-memory se selezionato
+      if (_activeFilter != null) {
+        debugPrint('PhotoboothFlowState: Applying filter $_activeFilter to file $processedPath');
+        final matrix = _getColorMatrixForFilter(_activeFilter);
+        processedPath = await _applyFilterToImageFile(processedPath, matrix);
+      }
+
+      // 2. Applica sempre la filigrana
+      debugPrint('PhotoboothFlowState: Applying watermark to file $processedPath');
+      processedPath = await _applyWatermarkToImageFile(processedPath);
+
+      _capturedImagePath = processedPath;
       if (_capturedImages.isNotEmpty) {
-        _capturedImages[_capturedImages.length - 1] = filteredPath;
+        _capturedImages[_capturedImages.length - 1] = processedPath;
       }
       notifyListeners();
     }
@@ -260,6 +271,87 @@ class PhotoboothFlowState extends ChangeNotifier {
     _autoResetTimer = Timer(delay, () {
       _askAnother();
     });
+  }
+
+  // Helper per applicare la filigrana nexthouse_logo_text.svg in basso a sinistra
+  Future<String> _applyWatermarkToImageFile(String inputPath) async {
+    try {
+      final File file = File(inputPath);
+      if (!await file.exists()) {
+        return inputPath;
+      }
+      final Uint8List bytes = await file.readAsBytes();
+
+      // Decode image
+      final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+      final ui.FrameInfo frameInfo = await codec.getNextFrame();
+      final ui.Image image = frameInfo.image;
+
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
+      final ui.Canvas canvas = ui.Canvas(recorder);
+
+      // Disegna l'immagine originale
+      canvas.drawImage(image, ui.Offset.zero, ui.Paint());
+
+      // Tenta il caricamento e disegno dell'SVG filigrana
+      try {
+        final PictureInfo pictureInfo = await vg.loadPicture(
+          const SvgAssetLoader('assets/images/nexthouse_logo_text.svg'),
+          null,
+        );
+
+        final double svgWidth = pictureInfo.size.width;
+        final double svgHeight = pictureInfo.size.height;
+        final double aspectRatio = svgHeight / svgWidth;
+
+        // Larghezza filigrana pari al 15% della larghezza dell'immagine
+        final double watermarkWidth = image.width * 0.15;
+        final double watermarkHeight = watermarkWidth * aspectRatio;
+
+        // Margine proporzionale per asse X (spostato più a destra) e Y (spostato leggermente più in basso)
+        final double marginX = image.width * 0.07;
+        final double marginY = image.width * 0.025;
+        final double targetX = marginX;
+        final double targetY = image.height - watermarkHeight - marginY;
+
+        canvas.save();
+        canvas.translate(targetX, targetY);
+        canvas.scale(watermarkWidth / svgWidth, watermarkHeight / svgHeight);
+        
+        canvas.drawPicture(pictureInfo.picture);
+        canvas.restore();
+
+        pictureInfo.picture.dispose();
+      } catch (svgError) {
+        debugPrint('Warning: Could not load SVG watermark during processing: $svgError');
+      }
+
+      final ui.Picture picture = recorder.endRecording();
+      final ui.Image watermarkedImage = await picture.toImage(image.width, image.height);
+
+      final ByteData? byteData = await watermarkedImage.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        return inputPath;
+      }
+
+      final Uint8List watermarkedBytes = byteData.buffer.asUint8List();
+      final String directory = file.parent.path;
+      final String outputPath = '$directory/watermarked_${DateTime.now().millisecondsSinceEpoch}.png';
+
+      await File(outputPath).writeAsBytes(watermarkedBytes, flush: true);
+
+      // Pulisce l'immagine precedente
+      try {
+        await file.delete();
+      } catch (e) {
+        debugPrint('Error deleting file: $e');
+      }
+
+      return outputPath;
+    } catch (e) {
+      debugPrint('Error applying watermark: $e');
+      return inputPath;
+    }
   }
 
   void _askAnother() {
@@ -767,7 +859,27 @@ class PhotoboothFlowState extends ChangeNotifier {
   // --- Wrapper/Metodi Legacy per piena retrocompatibilità con la UI corrente ---
 
   void startShareFlow() {
+    _cancelTimers();
+    _state = PhotoboothState.shareTerms;
+    notifyListeners();
+
+    _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
+      resetToHome();
+    });
+  }
+
+  void acceptTermsAndProceed() {
     prepareShareSelection();
+  }
+
+  void declineTerms() {
+    _cancelTimers();
+    _state = PhotoboothState.result;
+    notifyListeners();
+
+    _autoResetTimer = Timer(AppDurations.resultAutoReset, () {
+      resetToHome();
+    });
   }
 
   void toggleImageSelection(String path) {
@@ -801,6 +913,9 @@ class PhotoboothFlowState extends ChangeNotifier {
       return false;
     }
   }
+
+  @visibleForTesting
+  Future<String> applyWatermarkToImageFileTest(String inputPath) => _applyWatermarkToImageFile(inputPath);
 
   void _cancelTimers() {
     _countdownTimer?.cancel();

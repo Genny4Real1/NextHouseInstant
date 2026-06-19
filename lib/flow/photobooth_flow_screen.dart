@@ -9,6 +9,7 @@ import 'screens/processing_screen.dart';
 import 'screens/ask_another_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/edit_screen.dart';
+import 'screens/share_terms_screen.dart';
 import 'screens/photo_selection_share_screen.dart';
 import 'screens/photo_gallery_screen_share_2.dart';
 
@@ -119,6 +120,15 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onCancel: () {
             _flowState.exitEditMode(save: false);
           },
+        );
+      case PhotoboothState.shareTerms:
+        return ShareTermsScreen(
+          key: const ValueKey('shareTerms'),
+          lastCapturedImagePath: _flowState.capturedImages.isNotEmpty
+              ? _flowState.capturedImages[_flowState.currentGalleryIndex]
+              : null,
+          onAccept: _flowState.acceptTermsAndProceed,
+          onDecline: _flowState.declineTerms,
         );
       case PhotoboothState.shareSelection:
         return PhotoSelectionShareScreen(
