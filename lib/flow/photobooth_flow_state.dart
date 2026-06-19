@@ -596,7 +596,7 @@ class PhotoboothFlowState extends ChangeNotifier {
         .toList();
     if (selectedItems.isEmpty) {
       debugPrint('PhotoboothFlowState: No photos selected');
-      _uploadError = "No photos selected for sharing.";
+      _uploadError = "No photos selected for download.";
       _shareSessionState = ShareSessionState(
         status: ShareSessionStatus.failed,
         errorMessage: _uploadError,
@@ -732,7 +732,7 @@ class PhotoboothFlowState extends ChangeNotifier {
     } catch (e, stack) {
       debugPrint('PhotoboothFlowState: Error during photo sharing: $e\n$stack');
       _isUploading = false;
-      _uploadError = "Unable to complete sharing: $e";
+      _uploadError = "Unable to complete download: $e";
       _shareSessionState = _shareSessionState.copyWith(
         status: ShareSessionStatus.failed,
         errorMessage: _uploadError,

@@ -217,7 +217,7 @@ class _ResultScreenState extends State<ResultScreen> {
                               ),
                               _buildActiveToolbarButton(
                                 assetPath: 'assets/images/Instant_Galllery_Share.png',
-                                label: 'Share',
+                                label: 'Download',
                                 onPressed: widget.onShare,
                               ),
                               _buildActiveToolbarButton(
