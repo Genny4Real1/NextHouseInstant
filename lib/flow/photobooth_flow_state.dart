@@ -107,6 +107,7 @@ class PhotoboothFlowState extends ChangeNotifier {
   String? get uploadError => _uploadError;
   String? get shareUrl => _shareUrl;
   String get backendUrl => _backendUrl.trim().replaceAll(' ', '');
+  String get privacyPolicyUrl => _backendConfig.privacyPolicyUrl;
 
 
   // Inizializza la fotocamera (preferendo la camera frontale per il photobooth)

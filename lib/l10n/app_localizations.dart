@@ -124,6 +124,12 @@ abstract class AppLocalizations {
   /// **'By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted after 48 hours.'**
   String get cloudStorageDesc;
 
+  /// No description provided for @gdprNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Controller: Next House. Contact: reservations@nexthousecopenhagen.com. Scan the QR code to read the full Privacy Policy.'**
+  String get gdprNotice;
+
   /// No description provided for @decline.
   ///
   /// In en, this message translates to:

@@ -19,6 +19,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted after 48 hours.';
 
   @override
+  String get gdprNotice =>
+      'Data Controller: Next House. Contact: reservations@nexthousecopenhagen.com. Scan the QR code to read the full Privacy Policy.';
+
+  @override
   String get decline => 'Decline';
 
   @override

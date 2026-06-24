@@ -19,6 +19,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Ved at vælge at dele vil dine billeder blive uploadet til en sikker cloud-server, så du kan få adgang til og downloade dem.\n\nFor at sikre dit privatliv slettes alle uploadede billeder automatisk og permanent efter 48 timer.';
 
   @override
+  String get gdprNotice =>
+      'Dataansvarlig: Next House. Kontakt: reservations@nexthousecopenhagen.com. Scan QR-koden for at læse den fulde privatlivspolitik.';
+
+  @override
   String get decline => 'Afvis';
 
   @override

@@ -6,6 +6,13 @@ import 'package:nexthouse_instant/l10n/app_localizations.dart';
 
 void main() {
   testWidgets('ShareTermsScreen renders and triggers callbacks', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1024, 768);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
     bool accepted = false;
     bool declined = false;
     final flowState = PhotoboothFlowState();

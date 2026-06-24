@@ -2,13 +2,16 @@ class BackendConfig {
   /// Centralized base URL configuration for local LAN debugging.
   /// Easily editable by hand. Avoid using localhost to support real tablet testing.
   static const String defaultBaseUrl = 'https://frontend-nexthouseinstant.pages.dev/api';
+  static const String defaultPrivacyUrl = 'https://nexthousecopenhagen.com/privacy-policy';
 
   final String baseUrl;
   final Duration timeout;
+  final String privacyPolicyUrl;
 
   const BackendConfig({
     this.baseUrl = defaultBaseUrl,
     this.timeout = const Duration(seconds: 15),
+    this.privacyPolicyUrl = defaultPrivacyUrl,
   });
 
   /// Helper to get a clean baseUrl without accidental spaces.

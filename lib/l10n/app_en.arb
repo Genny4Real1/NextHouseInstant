@@ -2,6 +2,7 @@
   "takeSelfie": "TAKE A SELFIE",
   "cloudStorageTitle": "Cloud Storage & Privacy",
   "cloudStorageDesc": "By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted after 48 hours.",
+  "gdprNotice": "Data Controller: Next House. Contact: reservations@nexthousecopenhagen.com. Scan the QR code to read the full Privacy Policy.",
   "decline": "Decline",
   "accept": "Accept",
   "takeAnotherQuestion": "Do you want to take another picture?",

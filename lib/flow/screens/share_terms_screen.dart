@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/camera_placeholder.dart';
@@ -124,6 +125,60 @@ class ShareTermsScreen extends StatelessWidget {
                         fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.s24),
+
+                    // GDPR section with QR Code
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(10),
+                        borderRadius: BorderRadius.circular(16.0),
+                        border: Border.all(
+                          color: Colors.white.withAlpha(20),
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              AppLocalizations.of(context)!.gdprNotice,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: Colors.white.withAlpha(200),
+                                fontSize: 13.0,
+                                height: 1.4,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20.0),
+                          // QR Code Container
+                          Container(
+                            width: 100.0,
+                            height: 100.0,
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withAlpha(30),
+                                  blurRadius: 10.0,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: QrImageView(
+                              data: flowState.privacyPolicyUrl,
+                              version: QrVersions.auto,
+                              size: 84.0,
+                              gapless: false,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.s32),
 

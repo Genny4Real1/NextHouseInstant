@@ -19,6 +19,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Al elegir compartir, sus fotos se subirán a un servidor seguro en la nube para que pueda acceder a ellas y descargarlas.\n\nPara garantizar su privacidad, todas las fotos subidas se eliminarán de forma automática y permanente después de 48 horas.';
 
   @override
+  String get gdprNotice =>
+      'Responsable del tratamiento: Next House. Contacto: reservations@nexthousecopenhagen.com. Escanee el código QR para leer la política de privacidad completa.';
+
+  @override
   String get decline => 'Rechazar';
 
   @override
