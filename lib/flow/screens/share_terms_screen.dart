@@ -5,16 +5,21 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/camera_placeholder.dart';
 
+import '../photobooth_flow_state.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
+
 class ShareTermsScreen extends StatelessWidget {
   final String? lastCapturedImagePath;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
+  final PhotoboothFlowState flowState;
 
   const ShareTermsScreen({
     super.key,
     required this.lastCapturedImagePath,
     required this.onAccept,
     required this.onDecline,
+    required this.flowState,
   });
 
   @override
@@ -92,9 +97,9 @@ class ShareTermsScreen extends StatelessWidget {
                     const SizedBox(height: AppSpacing.s24),
 
                     // Title
-                    const Text(
-                      'Cloud Storage & Privacy',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.cloudStorageTitle,
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         color: Colors.white,
                         fontSize: 32.0,
@@ -105,9 +110,9 @@ class ShareTermsScreen extends StatelessWidget {
                     const SizedBox(height: AppSpacing.s16),
 
                     // Body details
-                    const Text(
-                      'By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted after 48 hours.',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.cloudStorageDesc,
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         color: AppColors.textPrimary,
                         fontSize: 16.0,
@@ -138,9 +143,9 @@ class ShareTermsScreen extends StatelessWidget {
                               ),
                             ),
                             onPressed: onDecline,
-                            child: const Text(
-                              'Decline',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.decline,
+                              style: const TextStyle(
                                 fontFamily: 'Inter',
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
@@ -163,9 +168,9 @@ class ShareTermsScreen extends StatelessWidget {
                               ),
                             ),
                             onPressed: onAccept,
-                            child: const Text(
-                              'Accept',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.accept,
+                              style: const TextStyle(
                                 fontFamily: 'Inter',
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,

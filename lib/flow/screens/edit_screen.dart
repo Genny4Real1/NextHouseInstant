@@ -9,6 +9,8 @@ import '../../theme/app_colors.dart';
 import '../../network/backend_config.dart';
 import '../../network/backend_models.dart';
 import '../../network/backend_service.dart';
+import '../photobooth_flow_state.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
 
 
 enum EditTool {
@@ -132,6 +134,7 @@ class EditScreen extends StatefulWidget {
   final ValueChanged<String> onSave;
   final VoidCallback onCancel;
   final String baseUrl;
+  final PhotoboothFlowState flowState;
 
   const EditScreen({
     super.key,
@@ -143,6 +146,7 @@ class EditScreen extends StatefulWidget {
     required this.onSave,
     required this.onCancel,
     required this.baseUrl,
+    required this.flowState,
   });
 
   @override
@@ -495,8 +499,8 @@ class _EditScreenState extends State<EditScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Unable to save image."),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.unableToSaveMsg),
             backgroundColor: AppColors.error,
           ),
         );
@@ -680,7 +684,9 @@ class _EditScreenState extends State<EditScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _editingTextElement != null ? "Edit Text" : "Add Text",
+                  _editingTextElement != null
+                      ? AppLocalizations.of(context)!.editTextTitle
+                      : AppLocalizations.of(context)!.addTextTitle,
                   style: const TextStyle(
                     color: Colors.white,
                     fontFamily: 'Inter',
@@ -697,24 +703,24 @@ class _EditScreenState extends State<EditScreen> {
                     fontFamily: 'Inter',
                     fontSize: 18.0,
                   ),
-                  decoration: const InputDecoration(
-                    hintText: "Write something...",
-                    hintStyle: TextStyle(
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.writeSomethingHint,
+                    hintStyle: const TextStyle(
                       color: Colors.white38,
                       fontFamily: 'Inter',
                     ),
-                    enabledBorder: UnderlineInputBorder(
+                    enabledBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white24),
                     ),
-                    focusedBorder: UnderlineInputBorder(
+                    focusedBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: Color(0xFFF26721)),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                const Text(
-                  "Text color:",
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.textColorLbl,
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontFamily: 'Inter',
                     fontSize: 14.0,
@@ -758,9 +764,9 @@ class _EditScreenState extends State<EditScreen> {
                   children: [
                     TextButton(
                       onPressed: _cancelTextEditing,
-                      child: const Text(
-                        "Cancel",
-                        style: TextStyle(color: Colors.white70, fontFamily: 'Inter'),
+                      child: Text(
+                        AppLocalizations.of(context)!.cancelBtn,
+                        style: const TextStyle(color: Colors.white70, fontFamily: 'Inter'),
                       ),
                     ),
                     const SizedBox(width: 12.0),
@@ -773,9 +779,9 @@ class _EditScreenState extends State<EditScreen> {
                         ),
                       ),
                       onPressed: _applyTextEditing,
-                      child: const Text(
-                        "Apply",
-                        style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold),
+                      child: Text(
+                        AppLocalizations.of(context)!.applyBtn,
+                        style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -1378,9 +1384,9 @@ class _EditScreenState extends State<EditScreen> {
                     color: const Color(0xFFF26721),
                     borderRadius: BorderRadius.circular(24.0),
                   ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.saveBtn,
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -1428,22 +1434,22 @@ class _EditScreenState extends State<EditScreen> {
             children: [
               _buildMainToolbarButton(
                 icon: const Icon(Icons.rotate_right_rounded, color: Colors.white, size: 40.0),
-                label: "Rotate",
+                label: AppLocalizations.of(context)!.rotateTool,
                 onTap: () => _onToolSelected(EditTool.rotate),
               ),
               _buildMainToolbarButton(
                 icon: const Icon(Icons.tune_rounded, color: Colors.white, size: 40.0),
-                label: "Adjust",
+                label: AppLocalizations.of(context)!.adjustTool,
                 onTap: () => _onToolSelected(EditTool.adjust),
               ),
               _buildMainToolbarButton(
                 icon: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 40.0),
-                label: "Filter",
+                label: AppLocalizations.of(context)!.filtersLabel,
                 onTap: () => _onToolSelected(EditTool.filter),
               ),
               _buildMainToolbarButton(
                 icon: const Icon(Icons.gesture_rounded, color: Colors.white, size: 40.0),
-                label: "Doodle",
+                label: AppLocalizations.of(context)!.drawTool,
                 onTap: () => _onToolSelected(EditTool.doodle),
               ),
               _buildMainToolbarButton(
@@ -1452,7 +1458,7 @@ class _EditScreenState extends State<EditScreen> {
                   color: Colors.white,
                   size: 40.0,
                 ),
-                label: "Text",
+                label: AppLocalizations.of(context)!.textTool,
                 onTap: () => _onToolSelected(EditTool.text),
               ),
               _buildMainToolbarButton(
@@ -1461,12 +1467,12 @@ class _EditScreenState extends State<EditScreen> {
                   color: Colors.white,
                   size: 40.0,
                 ),
-                label: "Sticker",
+                label: AppLocalizations.of(context)!.stickerTool,
                 onTap: () => _onToolSelected(EditTool.sticker),
               ),
               _buildMainToolbarButton(
                 icon: const Icon(Icons.sentiment_satisfied_alt_rounded, color: Colors.white, size: 40.0),
-                label: "Emoji",
+                label: AppLocalizations.of(context)!.emoji,
                 onTap: () => _onToolSelected(EditTool.emoji),
               ),
             ],
@@ -1601,17 +1607,17 @@ class _EditScreenState extends State<EditScreen> {
                   _buildAdjustSubToolButton(
                     subTool: AdjustSubTool.brightness,
                     icon: const Icon(Icons.light_mode_rounded, size: 32.0),
-                    label: "Brightness",
+                    label: AppLocalizations.of(context)!.brightnessLbl,
                   ),
                   _buildAdjustSubToolButton(
                     subTool: AdjustSubTool.contrast,
                     icon: const Icon(Icons.contrast_rounded, size: 32.0),
-                    label: "Contrast",
+                    label: AppLocalizations.of(context)!.contrastLbl,
                   ),
                   _buildAdjustSubToolButton(
                     subTool: AdjustSubTool.saturation,
                     icon: const Icon(Icons.opacity_rounded, size: 32.0),
-                    label: "Saturation",
+                    label: AppLocalizations.of(context)!.saturationLbl,
                   ),
                   _buildAdjustSubToolButton(
                     subTool: AdjustSubTool.sharpness,
@@ -1622,17 +1628,17 @@ class _EditScreenState extends State<EditScreen> {
                       color: Colors.white,
                       fit: BoxFit.contain,
                     ),
-                    label: "Sharpness",
+                    label: AppLocalizations.of(context)!.sharpnessLbl,
                   ),
                   _buildAdjustSubToolButton(
                     subTool: AdjustSubTool.hue,
                     icon: const Icon(Icons.color_lens_rounded, size: 32.0),
-                    label: "Hue",
+                    label: AppLocalizations.of(context)!.hueLbl,
                   ),
                   _buildAdjustSubToolButton(
                     subTool: AdjustSubTool.bw,
                     icon: const Icon(Icons.tonality_rounded, size: 32.0),
-                    label: "BW",
+                    label: AppLocalizations.of(context)!.bwLbl,
                   ),
                 ],
               ),
@@ -1705,23 +1711,23 @@ class _EditScreenState extends State<EditScreen> {
             children: [
               _buildFilterThumbnailButton(
                 filterKey: null,
-                label: "Original",
+                label: AppLocalizations.of(context)!.noFilter,
               ),
               _buildFilterThumbnailButton(
                 filterKey: "grayscale",
-                label: "Grayscale",
+                label: AppLocalizations.of(context)!.grayscale,
               ),
               _buildFilterThumbnailButton(
                 filterKey: "sepia",
-                label: "Sepia",
+                label: AppLocalizations.of(context)!.sepia,
               ),
               _buildFilterThumbnailButton(
                 filterKey: "cool",
-                label: "Cool",
+                label: AppLocalizations.of(context)!.cool,
               ),
               _buildFilterThumbnailButton(
                 filterKey: "warm",
-                label: "Warm",
+                label: AppLocalizations.of(context)!.warm,
               ),
             ],
           ),
@@ -1896,12 +1902,12 @@ class _EditScreenState extends State<EditScreen> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.add_rounded, color: Colors.white, size: 28.0),
-                SizedBox(width: 8.0),
+              children: [
+                const Icon(Icons.add_rounded, color: Colors.white, size: 28.0),
+                const SizedBox(width: 8.0),
                 Text(
-                  "Aggiungi Testo",
-                  style: TextStyle(
+                  AppLocalizations.of(context)!.addTextTitle,
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
@@ -1940,7 +1946,7 @@ class _EditScreenState extends State<EditScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _stickersError ?? "Error loading stickers",
+                _stickersError ?? AppLocalizations.of(context)!.errorLoadingStickers,
                 style: const TextStyle(color: Colors.white70, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 8.0),
@@ -1954,7 +1960,7 @@ class _EditScreenState extends State<EditScreen> {
                   ),
                 ),
                 onPressed: _loadStickers,
-                child: const Text("Retry", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
+                child: Text(AppLocalizations.of(context)!.retry, style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
               ),
             ],
           ),

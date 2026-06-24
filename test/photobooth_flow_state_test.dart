@@ -45,5 +45,30 @@ void main() {
       final nonExistentResult = await flowState.applyWatermarkToImageFileTest('/non/existent/path.png');
       expect(nonExistentResult, '/non/existent/path.png');
     });
+
+    test('initial locale should be English', () {
+      final flowState = PhotoboothFlowState();
+      expect(flowState.localeCode, 'en');
+    });
+
+    test('changing locale should update localeCode and notify listeners', () {
+      final flowState = PhotoboothFlowState();
+      bool listenerNotified = false;
+      flowState.addListener(() {
+        listenerNotified = true;
+      });
+      flowState.setLocale('it');
+      expect(flowState.localeCode, 'it');
+      expect(listenerNotified, true);
+    });
+
+    test('resetToHome should reset locale to English', () {
+      final flowState = PhotoboothFlowState();
+      flowState.setLocale('it');
+      expect(flowState.localeCode, 'it');
+      
+      flowState.resetToHome();
+      expect(flowState.localeCode, 'en');
+    });
   });
 }

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../photobooth_flow_state.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/camera_placeholder.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
 
 class CountdownScreen extends StatefulWidget {
   final PhotoboothFlowState flowState;
@@ -153,11 +154,11 @@ class _CountdownScreenState extends State<CountdownScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            _buildFilterItem(null, "No Filter", state),
-                            _buildFilterItem("grayscale", "Grayscale", state),
-                            _buildFilterItem("sepia", "Sepia", state),
-                            _buildFilterItem("cool", "Cool", state),
-                            _buildFilterItem("warm", "Warm", state),
+                            _buildFilterItem(null, AppLocalizations.of(context)!.noFilter, state),
+                            _buildFilterItem("grayscale", AppLocalizations.of(context)!.grayscale, state),
+                            _buildFilterItem("sepia", AppLocalizations.of(context)!.sepia, state),
+                            _buildFilterItem("cool", AppLocalizations.of(context)!.cool, state),
+                            _buildFilterItem("warm", AppLocalizations.of(context)!.warm, state),
                           ],
                         ),
                       ),

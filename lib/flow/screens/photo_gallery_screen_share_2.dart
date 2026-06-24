@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../theme/app_colors.dart';
 import '../photobooth_flow_state.dart';
 import '../../network/backend_models.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
 
 class PhotoGalleryScreenShare2 extends StatefulWidget {
   final PhotoboothFlowState flowState;
@@ -150,9 +151,9 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(29.0),
                           ),
-                          child: const Text(
-                            'Scan me!',
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.scanMe,
+                            style: const TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
@@ -194,8 +195,8 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
 
   Widget _buildLoadingState(ShareSessionStatus status, ShareSessionState state) {
     final String message = status == ShareSessionStatus.uploadingPhotos
-        ? "Uploading photo ${state.uploadedCount} of ${state.totalCount}..."
-        : "Creating download link...";
+        ? AppLocalizations.of(context)!.uploadingPhotoOf('${state.uploadedCount}', '${state.totalCount}')
+        : AppLocalizations.of(context)!.creatingLink;
 
     return Container(
       width: 580.0,
@@ -231,9 +232,9 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12.0),
-          const Text(
-            "Stay close to the kiosk while we complete the operation.",
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.stayCloseMsg,
+            style: const TextStyle(
               fontFamily: 'Inter',
               color: AppColors.textSecondary,
               fontSize: 14.0,
@@ -272,9 +273,9 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
             size: 64.0,
           ),
           const SizedBox(height: 24.0),
-          const Text(
-            "Sharing Error",
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.sharingError,
+            style: const TextStyle(
               fontFamily: 'Inter',
               color: Colors.white,
               fontSize: 24.0,
@@ -309,9 +310,9 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   ),
                   onPressed: widget.flowState.goToShareSelection,
-                  child: const Text(
-                    'Back to selection',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.backToSelection,
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 15.0,
                       fontWeight: FontWeight.bold,
@@ -332,13 +333,13 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   ),
                   onPressed: widget.flowState.shareSelectedPhotos,
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.replay_rounded, size: 18.0),
-                      SizedBox(width: 8.0),
+                      const Icon(Icons.replay_rounded, size: 18.0),
+                      const SizedBox(width: 8.0),
                       Text(
-                        'Retry',
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.retry,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 15.0,
                           fontWeight: FontWeight.bold,

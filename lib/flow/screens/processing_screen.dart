@@ -5,14 +5,19 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/camera_placeholder.dart';
 
+import '../photobooth_flow_state.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
+
 class ProcessingScreen extends StatefulWidget {
   final String? capturedImagePath;
   final String? activeFilter;
+  final PhotoboothFlowState flowState;
 
   const ProcessingScreen({
     super.key,
     this.capturedImagePath,
     this.activeFilter,
+    required this.flowState,
   });
 
   @override
@@ -220,9 +225,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Testo "Processing"
-                const Text(
-                  'Processing',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.processing,
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 72.0,
                     fontWeight: FontWeight.w800,

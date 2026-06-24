@@ -4,6 +4,9 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/camera_placeholder.dart';
 
+import '../photobooth_flow_state.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
+
 class ResultScreen extends StatefulWidget {
   final VoidCallback onReset;
   final VoidCallback onDone;
@@ -16,6 +19,7 @@ class ResultScreen extends StatefulWidget {
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final ValueChanged<int> onPageChanged;
+  final PhotoboothFlowState flowState;
 
   const ResultScreen({
     super.key,
@@ -30,6 +34,7 @@ class ResultScreen extends StatefulWidget {
     required this.onPrevious,
     required this.onNext,
     required this.onPageChanged,
+    required this.flowState,
   });
 
   @override
@@ -191,9 +196,9 @@ class _ResultScreenState extends State<ResultScreen> {
                                 ),
                               ),
                               onPressed: widget.onDone,
-                              child: const Text(
-                                'Done',
-                                style: TextStyle(
+                              child: Text(
+                                AppLocalizations.of(context)!.done,
+                                style: const TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.bold,
@@ -212,17 +217,17 @@ class _ResultScreenState extends State<ResultScreen> {
                             children: [
                               _buildActiveToolbarButton(
                                 assetPath: 'assets/images/Instant_Gallery_Edit.png',
-                                label: 'Edit',
+                                label: AppLocalizations.of(context)!.edit,
                                 onPressed: widget.onEdit,
                               ),
                               _buildActiveToolbarButton(
                                 assetPath: 'assets/images/Instant_Galllery_Share.png',
-                                label: 'Share',
+                                label: AppLocalizations.of(context)!.share,
                                 onPressed: widget.onShare,
                               ),
                               _buildActiveToolbarButton(
                                 assetPath: 'assets/images/Instant_Gallery_Delete.png',
-                                label: 'Delete',
+                                label: AppLocalizations.of(context)!.delete,
                                 onPressed: widget.onDelete,
                               ),
                             ],

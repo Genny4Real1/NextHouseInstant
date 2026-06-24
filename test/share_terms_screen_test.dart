@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexthouse_instant/flow/screens/share_terms_screen.dart';
+import 'package:nexthouse_instant/flow/photobooth_flow_state.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
 
 void main() {
   testWidgets('ShareTermsScreen renders and triggers callbacks', (WidgetTester tester) async {
     bool accepted = false;
     bool declined = false;
+    final flowState = PhotoboothFlowState();
 
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: ShareTermsScreen(
           lastCapturedImagePath: null,
           onAccept: () {
@@ -17,6 +22,7 @@ void main() {
           onDecline: () {
             declined = true;
           },
+          flowState: flowState,
         ),
       ),
     );

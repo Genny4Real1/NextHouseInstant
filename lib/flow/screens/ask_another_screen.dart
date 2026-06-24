@@ -4,16 +4,21 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/camera_placeholder.dart';
 
+import '../photobooth_flow_state.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
+
 class AskAnotherScreen extends StatelessWidget {
   final String? capturedImagePath;
   final VoidCallback onYes;
   final VoidCallback onNo;
+  final PhotoboothFlowState flowState;
 
   const AskAnotherScreen({
     super.key,
     required this.capturedImagePath,
     required this.onYes,
     required this.onNo,
+    required this.flowState,
   });
 
   @override
@@ -58,11 +63,11 @@ class AskAnotherScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Domanda
-                const Expanded(
+                Expanded(
                   child: Center(
                     child: Text(
-                      'Do you want to take another picture?',
-                      style: TextStyle(
+                      AppLocalizations.of(context)!.takeAnotherQuestion,
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 36.0,
                         fontWeight: FontWeight.bold,
@@ -81,13 +86,13 @@ class AskAnotherScreen extends StatelessWidget {
                   children: [
                     // Pulsante Sì
                     _buildDialogButton(
-                      text: 'Yes',
+                      text: AppLocalizations.of(context)!.yes,
                       onPressed: onYes,
                     ),
                     
                     // Pulsante No
                     _buildDialogButton(
-                      text: 'No',
+                      text: AppLocalizations.of(context)!.no,
                       onPressed: onNo,
                     ),
                   ],

@@ -14,32 +14,28 @@ import 'screens/photo_selection_share_screen.dart';
 import 'screens/photo_gallery_screen_share_2.dart';
 
 class PhotoboothFlowScreen extends StatefulWidget {
-  const PhotoboothFlowScreen({super.key});
+  final PhotoboothFlowState flowState;
+
+  const PhotoboothFlowScreen({
+    super.key,
+    required this.flowState,
+  });
 
   @override
   State<PhotoboothFlowScreen> createState() => _PhotoboothFlowScreenState();
 }
 
 class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
-  late final PhotoboothFlowState _flowState;
+  PhotoboothFlowState get _flowState => widget.flowState;
 
   @override
   void initState() {
     super.initState();
-    _flowState = PhotoboothFlowState();
-    // Avvia l'inizializzazione asincrona della fotocamera reale all'avvio del chiosco
-    _flowState.initializeCamera();
 
     // Avvia la modalità Kiosk protetta su Android al completamento del layout
     WidgetsBinding.instance.addPostFrameCallback((_) {
       KioskService.startKioskMode();
     });
-  }
-
-  @override
-  void dispose() {
-    _flowState.dispose();
-    super.dispose();
   }
 
   @override
@@ -65,6 +61,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
         return IdleScreen(
           key: const ValueKey('idle'),
           onStart: _flowState.startFlow,
+          flowState: _flowState,
         );
       case PhotoboothState.countdown:
         return CountdownScreen(
@@ -82,6 +79,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           key: const ValueKey('processing'),
           capturedImagePath: _flowState.capturedImagePath,
           activeFilter: _flowState.activeFilter,
+          flowState: _flowState,
         );
       case PhotoboothState.askAnother:
         return AskAnotherScreen(
@@ -89,6 +87,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           capturedImagePath: _flowState.capturedImagePath,
           onYes: _flowState.takeAnotherPhoto,
           onNo: _flowState.showGallery,
+          flowState: _flowState,
         );
       case PhotoboothState.result:
         return ResultScreen(
@@ -104,6 +103,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onPrevious: _flowState.previousImage,
           onNext: _flowState.nextImage,
           onPageChanged: _flowState.setGalleryIndex,
+          flowState: _flowState,
         );
       case PhotoboothState.edit:
         return EditScreen(
@@ -120,6 +120,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onCancel: () {
             _flowState.exitEditMode(save: false);
           },
+          flowState: _flowState,
         );
       case PhotoboothState.shareTerms:
         return ShareTermsScreen(
@@ -129,6 +130,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
               : null,
           onAccept: _flowState.acceptTermsAndProceed,
           onDecline: _flowState.declineTerms,
+          flowState: _flowState,
         );
       case PhotoboothState.shareSelection:
         return PhotoSelectionShareScreen(
@@ -140,6 +142,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onDone: _flowState.completeShareSelection,
           isUploading: _flowState.isUploading,
           uploadError: _flowState.uploadError,
+          flowState: _flowState,
         );
       case PhotoboothState.shareQr:
         return PhotoGalleryScreenShare2(

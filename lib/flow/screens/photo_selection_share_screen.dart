@@ -4,6 +4,9 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/camera_placeholder.dart';
 
+import '../photobooth_flow_state.dart';
+import 'package:nexthouse_instant/l10n/app_localizations.dart';
+
 class PhotoSelectionShareScreen extends StatelessWidget {
   final List<String> capturedImages;
   final Set<String> selectedImages;
@@ -12,6 +15,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
   final VoidCallback onDone;
   final bool isUploading;
   final String? uploadError;
+  final PhotoboothFlowState flowState;
 
   const PhotoSelectionShareScreen({
     super.key,
@@ -22,6 +26,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
     required this.onDone,
     required this.isUploading,
     required this.uploadError,
+    required this.flowState,
   });
 
   @override
@@ -38,9 +43,9 @@ class PhotoSelectionShareScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: AppSpacing.s24),
                 // Titolo della pagina
-                const Text(
-                  'Share your photos',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.sharePhotosTitle,
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     color: Colors.white,
                     fontSize: 32.0,
@@ -50,7 +55,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4.0),
                 Text(
-                  'Select the images you want to save (${selectedImages.length} of ${capturedImages.length} selected)',
+                  '${AppLocalizations.of(context)!.sharePhotosSubtitle} (${selectedImages.length} ${AppLocalizations.of(context)!.ofWord} ${capturedImages.length} ${AppLocalizations.of(context)!.selected})',
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     color: AppColors.textSecondary,
@@ -96,9 +101,9 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                             ),
                           ),
                           onPressed: onDone,
-                          child: const Text(
-                            'Retry',
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.retry,
+                            style: const TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
                               fontSize: 13.0,
@@ -230,7 +235,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Share',
+                            AppLocalizations.of(context)!.share,
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 18.0,
@@ -292,27 +297,27 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircularProgressIndicator(
+                          const CircularProgressIndicator(
                             strokeWidth: 4.0,
                             valueColor: AlwaysStoppedAnimation<Color>(AppColors.nextHouseOrange),
                           ),
-                          SizedBox(height: 24.0),
+                          const SizedBox(height: 24.0),
                           Text(
-                            "Uploading photos...",
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.uploadingPhotos,
+                            style: const TextStyle(
                               fontFamily: 'Inter',
                               color: Colors.white,
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8.0),
+                          const SizedBox(height: 8.0),
                           Text(
-                            "Creating download session",
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.creatingSession,
+                            style: const TextStyle(
                               fontFamily: 'Inter',
                               color: AppColors.textSecondary,
                               fontSize: 14.0,

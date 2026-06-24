@@ -24,6 +24,7 @@ enum PhotoboothState {
 
 class PhotoboothFlowState extends ChangeNotifier {
   PhotoboothState _state = PhotoboothState.idle;
+  String _localeCode = 'en';
   int _countdownValue = AppDurations.countdownStart;
   Timer? _countdownTimer;
   Timer? _autoResetTimer;
@@ -61,6 +62,15 @@ class PhotoboothFlowState extends ChangeNotifier {
   }
 
   PhotoboothState get state => _state;
+  String get localeCode => _localeCode;
+
+  void setLocale(String value) {
+    if (_localeCode != value) {
+      _localeCode = value;
+      notifyListeners();
+    }
+  }
+
   int get countdownValue => _countdownValue;
   CameraController? get cameraController => _cameraController;
   bool get isCameraInitialized => _isCameraInitialized;
@@ -540,6 +550,7 @@ class PhotoboothFlowState extends ChangeNotifier {
     _cancelTimers();
     resetShareFlow();
     _state = PhotoboothState.idle;
+    _localeCode = 'en';
     _capturedImagePath = null;
     _capturedImages.clear();
     _currentGalleryIndex = 0;
