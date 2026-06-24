@@ -216,17 +216,17 @@ class _ResultScreenState extends State<ResultScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               _buildActiveToolbarButton(
-                                assetPath: 'assets/images/Instant_Gallery_Edit.png',
+                                icon: Icons.edit_rounded,
                                 label: AppLocalizations.of(context)!.edit,
                                 onPressed: widget.onEdit,
                               ),
                               _buildActiveToolbarButton(
-                                assetPath: 'assets/images/Instant_Galllery_Share.png',
+                                icon: Icons.share_rounded,
                                 label: AppLocalizations.of(context)!.share,
                                 onPressed: widget.onShare,
                               ),
                               _buildActiveToolbarButton(
-                                assetPath: 'assets/images/Instant_Gallery_Delete.png',
+                                icon: Icons.delete_rounded,
                                 label: AppLocalizations.of(context)!.delete,
                                 onPressed: widget.onDelete,
                               ),
@@ -309,7 +309,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
 
   Widget _buildActiveToolbarButton({
-    required String assetPath,
+    required IconData icon,
     required String label,
     required VoidCallback onPressed,
   }) {
@@ -318,13 +318,42 @@ class _ResultScreenState extends State<ResultScreen> {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(16.0),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-          child: Image.asset(
-            assetPath,
-            width: 120.0,
-            height: 120.0,
-            fit: BoxFit.contain,
+        child: Container(
+          width: 120.0,
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 76.0,
+                height: 76.0,
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(20),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                    size: 36.0,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16.0,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),
