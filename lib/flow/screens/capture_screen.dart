@@ -96,7 +96,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
               ),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     'Photo captured',
                     style: AppTextStyles.header1,
                   ),
@@ -126,7 +126,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                   const SizedBox(height: AppSpacing.s16),
 
                   // Mantiene bilanciamento spaziale
-                  const Opacity(
+                  Opacity(
                     opacity: 0.0,
                     child: Text('', style: AppTextStyles.header2),
                   ),

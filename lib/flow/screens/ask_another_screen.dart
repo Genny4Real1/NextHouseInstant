@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
@@ -39,65 +40,75 @@ class AskAnotherScreen extends StatelessWidget {
               : const CameraPlaceholder(showGuides: false),
         ),
 
-        // Dialogo di richiesta al centro
+        // Dialogo di richiesta al centro con glassmorphism
         Center(
-          child: Container(
-            width: 540.0,
-            height: 380.0,
-            padding: const EdgeInsets.symmetric(
-              vertical: AppSpacing.s32,
-              horizontal: AppSpacing.s48,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.nextHouseOrange.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(40.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(76),
-                  blurRadius: 30.0,
-                  offset: const Offset(0.0, 15.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(40.0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              child: Container(
+                width: 540.0,
+                height: 380.0,
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.s32,
+                  horizontal: AppSpacing.s48,
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Domanda
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.takeAnotherQuestion,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 36.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        height: 1.2,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                decoration: BoxDecoration(
+                  color: AppColors.nextHouseOrange.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(40.0),
+                  border: Border.all(
+                    color: Colors.white.withAlpha(25),
+                    width: 1.5,
                   ),
-                ),
-                const SizedBox(height: AppSpacing.s24),
-
-                // Pulsanti Sì / No
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // Pulsante Sì
-                    _buildDialogButton(
-                      text: AppLocalizations.of(context)!.yes,
-                      onPressed: onYes,
-                    ),
-                    
-                    // Pulsante No
-                    _buildDialogButton(
-                      text: AppLocalizations.of(context)!.no,
-                      onPressed: onNo,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(76),
+                      blurRadius: 30.0,
+                      offset: const Offset(0.0, 15.0),
                     ),
                   ],
                 ),
-              ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Domanda
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.takeAnotherQuestion,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 36.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            height: 1.2,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.s24),
+
+                    // Pulsanti Sì / No
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Pulsante Sì
+                        _buildDialogButton(
+                          text: AppLocalizations.of(context)!.yes,
+                          onPressed: onYes,
+                        ),
+                        
+                        // Pulsante No
+                        _buildDialogButton(
+                          text: AppLocalizations.of(context)!.no,
+                          onPressed: onNo,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
@@ -89,22 +90,32 @@ class _ResultScreenState extends State<ResultScreen> {
                 const SizedBox(height: AppSpacing.s24),
                 // Indicatore contatore foto in alto (es. 2 / 3)
                 if (hasImages && widget.capturedImages.length > 1)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.s16,
-                      vertical: AppSpacing.s8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(25),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Text(
-                      '${widget.currentGalleryIndex + 1} / ${widget.capturedImages.length}',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        color: Colors.white,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.s16,
+                          vertical: AppSpacing.s8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(20),
+                          borderRadius: BorderRadius.circular(20.0),
+                          border: Border.all(
+                            color: Colors.white.withAlpha(30),
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Text(
+                          '${widget.currentGalleryIndex + 1} / ${widget.capturedImages.length}',
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            color: Colors.white,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -238,46 +249,64 @@ class _ResultScreenState extends State<ResultScreen> {
               ],
             ),
 
-            // Pulsante Freccia Sinistra (Precedente)
+            // Pulsante Freccia Sinistra (Precedente) con glassmorphism
             if (widget.showDoneToolbar && hasImages && widget.capturedImages.length > 1)
               Positioned(
                 left: 24.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(25),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    iconSize: 40.0,
-                    icon: Image.asset(
-                      'assets/images/Instant_Gallery_LeftNavigation.png',
-                      width: 40.0,
-                      height: 40.0,
-                      fit: BoxFit.contain,
+                child: ClipOval(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(20),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withAlpha(35),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: IconButton(
+                        iconSize: 40.0,
+                        icon: Image.asset(
+                          'assets/images/Instant_Gallery_LeftNavigation.png',
+                          width: 40.0,
+                          height: 40.0,
+                          fit: BoxFit.contain,
+                        ),
+                        onPressed: widget.onPrevious,
+                      ),
                     ),
-                    onPressed: widget.onPrevious,
                   ),
                 ),
               ),
 
-            // Pulsante Freccia Destra (Successiva)
+            // Pulsante Freccia Destra (Successiva) con glassmorphism
             if (widget.showDoneToolbar && hasImages && widget.capturedImages.length > 1)
               Positioned(
                 right: 24.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(25),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    iconSize: 40.0,
-                    icon: Image.asset(
-                      'assets/images/Instant_Gallery_RightNavigation.png',
-                      width: 40.0,
-                      height: 40.0,
-                      fit: BoxFit.contain,
+                child: ClipOval(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(20),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withAlpha(35),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: IconButton(
+                        iconSize: 40.0,
+                        icon: Image.asset(
+                          'assets/images/Instant_Gallery_RightNavigation.png',
+                          width: 40.0,
+                          height: 40.0,
+                          fit: BoxFit.contain,
+                        ),
+                        onPressed: widget.onNext,
+                      ),
                     ),
-                    onPressed: widget.onNext,
                   ),
                 ),
               ),
@@ -331,6 +360,17 @@ class _ResultScreenState extends State<ResultScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(20),
                   shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withAlpha(30),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(30),
+                      blurRadius: 10.0,
+                      offset: const Offset(0.0, 4.0),
+                    ),
+                  ],
                 ),
                 child: Center(
                   child: Icon(

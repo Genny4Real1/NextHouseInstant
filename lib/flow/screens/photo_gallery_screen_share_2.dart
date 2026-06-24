@@ -98,8 +98,19 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     height: 610.0,
                     padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 30.0),
                     decoration: BoxDecoration(
-                      color: AppColors.nextHouseOrange,
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.nextHouseOrange,
+                          Color(0xFFC74C13),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(60.0),
+                      border: Border.all(
+                        color: Colors.white.withAlpha(25),
+                        width: 1.5,
+                      ),
                       boxShadow: const [
                         BoxShadow(
                           color: Colors.black54,

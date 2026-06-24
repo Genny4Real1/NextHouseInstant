@@ -57,27 +57,31 @@ class ShareTermsScreen extends StatelessWidget {
           // 3. Central card with Terms & Conditions
           Center(
             child: SingleChildScrollView(
-              child: Container(
-                width: 600.0,
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.s32,
-                  horizontal: AppSpacing.s48,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withAlpha(220),
-                  borderRadius: BorderRadius.circular(32.0),
-                  border: Border.all(
-                    color: Colors.white.withAlpha(20),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(120),
-                      blurRadius: 30.0,
-                      offset: const Offset(0.0, 10.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32.0),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                  child: Container(
+                    width: 600.0,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.s32,
+                      horizontal: AppSpacing.s48,
                     ),
-                  ],
-                ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface.withAlpha(200),
+                      borderRadius: BorderRadius.circular(32.0),
+                      border: Border.all(
+                        color: Colors.white.withAlpha(20),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(120),
+                          blurRadius: 30.0,
+                          offset: const Offset(0.0, 10.0),
+                        ),
+                      ],
+                    ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -185,8 +189,10 @@ class ShareTermsScreen extends StatelessWidget {
               ),
             ),
           ),
-        ],
+        ),
       ),
+    ],
+  ),
     );
   }
 }

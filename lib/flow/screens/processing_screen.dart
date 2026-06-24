@@ -201,70 +201,82 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         // Sfondo semitrasparente
         Positioned.fill(child: Container(color: Colors.black.withAlpha(50))),
 
-        // Box arancione centrale di elaborazione
+        // Box arancione centrale di elaborazione con glassmorphism
         Center(
-          child: Container(
-            width: 600.0,
-            height: 440.0,
-            padding: const EdgeInsets.symmetric(
-              vertical: 40.0,
-              horizontal: AppSpacing.s48,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.nextHouseOrange.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(60.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(76),
-                  blurRadius: 30.0,
-                  offset: const Offset(0.0, 15.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(60.0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+              child: Container(
+                width: 600.0,
+                height: 440.0,
+                 padding: const EdgeInsets.symmetric(
+                  vertical: 28.0,
+                  horizontal: AppSpacing.s48,
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Testo "Processing"
-                Text(
-                  AppLocalizations.of(context)!.processing,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 72.0,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: 1.0,
+                decoration: BoxDecoration(
+                  color: AppColors.nextHouseOrange.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(60.0),
+                  border: Border.all(
+                    color: Colors.white.withAlpha(25),
+                    width: 1.5,
                   ),
-                  textAlign: TextAlign.center,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(76),
+                      blurRadius: 30.0,
+                      offset: const Offset(0.0, 15.0),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 40.0),
-
-                // Ruota di caricamento che gira da Figma
-                RotationTransition(
-                  turns: _rotationController,
-                  child: Image.network(
-                    'http://localhost:3845/assets/d8785036d17612960f0b02a9176166b7c5010ebc.png',
-                    width: 220.0,
-                    height: 220.0,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Fallback se il server locale non risponde
-                      return const SizedBox(
-                        width: 100.0,
-                        height: 100.0,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 6.0,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Testo "Processing" (FittedBox previene overflow da traduzione)
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        AppLocalizations.of(context)!.processing,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 72.0,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: 1.0,
                         ),
-                      );
-                    },
-                  ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+
+                    // Ruota di caricamento che gira da Figma (GIF locale)
+                    SizedBox(
+                      width: 220.0,
+                      height: 220.0,
+                      child: Image.asset(
+                        'assets/images/Instant_SpinningWheel.gif',
+                        width: 220.0,
+                        height: 220.0,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 6.0,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
+
       ],
     );
   }
