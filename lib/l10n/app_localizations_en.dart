@@ -20,7 +20,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gdprNotice =>
-      'Data Controller: Next House. Contact: reservations@nexthousecopenhagen.com. Scan the QR code to read the full Privacy Policy.';
+      'Data Controller: Arp-Hansen Hotel Group.\nContact: reservations@nexthousecopenhagen.com.\nScan the QR code to read the full Privacy Policy.';
 
   @override
   String get decline => 'Decline';

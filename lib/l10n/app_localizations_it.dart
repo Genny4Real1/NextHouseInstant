@@ -20,7 +20,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get gdprNotice =>
-      'Titolare del trattamento: Next House. Contatto: reservations@nexthousecopenhagen.com. Inquadra il QR code per leggere l\'informativa completa.';
+      'Titolare del trattamento: Arp-Hansen Hotel Group.\nContatto: reservations@nexthousecopenhagen.com.\nInquadra il QR code per leggere l\'informativa completa.';
 
   @override
   String get decline => 'Rifiuta';
