@@ -6,6 +6,7 @@ import '../../widgets/camera_placeholder.dart';
 
 import '../photobooth_flow_state.dart';
 import 'package:nexthouse_instant/l10n/app_localizations.dart';
+import '../../widgets/language_selector.dart';
 
 class PhotoSelectionShareScreen extends StatelessWidget {
   final List<String> capturedImages;
@@ -275,6 +276,13 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                   onPressed: isUploading ? null : onCancel,
                 ),
               ),
+            ),
+
+            // Selettore lingua discreto in alto a destra (a sinistra del pulsante Chiudi)
+            Positioned(
+              top: 20.0,
+              right: 80.0,
+              child: LanguageSelector(flowState: flowState),
             ),
 
             // Overlay di caricamento con sfocatura premium

@@ -8,6 +8,7 @@ import '../../widgets/camera_placeholder.dart';
 
 import '../photobooth_flow_state.dart';
 import 'package:nexthouse_instant/l10n/app_localizations.dart';
+import '../../widgets/language_selector.dart';
 
 class ShareTermsScreen extends StatelessWidget {
   final String? lastCapturedImagePath;
@@ -245,6 +246,12 @@ class ShareTermsScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+      // 4. Selettore della lingua in alto a destra
+      Positioned(
+        top: 24.0,
+        right: 24.0,
+        child: LanguageSelector(flowState: flowState),
       ),
     ],
   ),

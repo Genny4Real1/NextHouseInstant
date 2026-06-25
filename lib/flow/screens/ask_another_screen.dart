@@ -7,6 +7,7 @@ import '../../widgets/camera_placeholder.dart';
 
 import '../photobooth_flow_state.dart';
 import 'package:nexthouse_instant/l10n/app_localizations.dart';
+import '../../widgets/language_selector.dart';
 
 class AskAnotherScreen extends StatelessWidget {
   final String? capturedImagePath;
@@ -111,6 +112,13 @@ class AskAnotherScreen extends StatelessWidget {
               ),
             ),
           ),
+        ),
+
+        // Selettore della lingua in alto a destra
+        Positioned(
+          top: 24.0,
+          right: 24.0,
+          child: LanguageSelector(flowState: flowState),
         ),
       ],
     );

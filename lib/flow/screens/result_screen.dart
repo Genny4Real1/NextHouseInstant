@@ -7,6 +7,7 @@ import '../../widgets/camera_placeholder.dart';
 
 import '../photobooth_flow_state.dart';
 import 'package:nexthouse_instant/l10n/app_localizations.dart';
+import '../../widgets/language_selector.dart';
 
 class ResultScreen extends StatefulWidget {
   final VoidCallback onReset;
@@ -329,6 +330,13 @@ class _ResultScreenState extends State<ResultScreen> {
                   onPressed: widget.onReset,
                 ),
               ),
+            ),
+
+            // Selettore lingua discreto in alto a destra (a sinistra del pulsante Chiudi)
+            Positioned(
+              top: 16.0,
+              right: 80.0,
+              child: LanguageSelector(flowState: widget.flowState),
             ),
           ],
         ),

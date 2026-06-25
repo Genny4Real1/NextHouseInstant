@@ -126,11 +126,14 @@ class PhotoboothFlowState extends ChangeNotifier {
         orElse: () => cameras.first,
       );
 
-      // Lista dei preset da provare
+      // Lista dei preset da provare (in ordine decrescente di qualità per ottenere la massima risoluzione supportata)
       final presets = [
+        ResolutionPreset.max,
+        ResolutionPreset.ultraHigh,
+        ResolutionPreset.veryHigh,
+        ResolutionPreset.high,
         ResolutionPreset.medium,
         ResolutionPreset.low,
-        ResolutionPreset.high,
       ];
 
       // Tenta prima con la fotocamera frontale

@@ -5,6 +5,7 @@ import '../photobooth_flow_state.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/camera_placeholder.dart';
 import 'package:nexthouse_instant/l10n/app_localizations.dart';
+import '../../widgets/language_selector.dart';
 
 class CountdownScreen extends StatefulWidget {
   final PhotoboothFlowState flowState;
@@ -107,6 +108,50 @@ class _CountdownScreenState extends State<CountdownScreen> {
                     showBackground: false,
                   ),
                 ),
+
+                // 2B. PULSANTE INDIETRO E SELETTORE LINGUA (sovrapposti se non in countdown)
+                if (!isCountingDown) ...[
+                  Positioned(
+                    left: 48.0,
+                    top: 24.0,
+                    child: GestureDetector(
+                      onTap: () {
+                        state.resetToHome();
+                      },
+                      child: Container(
+                        width: 72.0,
+                        height: 72.0,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withAlpha(120),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withAlpha(40),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(60),
+                              blurRadius: 10.0,
+                              offset: const Offset(0.0, 4.0),
+                            ),
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: SvgPicture.asset(
+                          'assets/images/Instant_Edit_Back_icon.svg',
+                          width: 36.0,
+                          height: 36.0,
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 48.0,
+                    top: 24.0,
+                    child: LanguageSelector(flowState: state),
+                  ),
+                ],
 
                 // 3. BARRA DEI FILTRI E PULSANTE BACCHETTA (se non in countdown)
                 if (!isCountingDown) ...[

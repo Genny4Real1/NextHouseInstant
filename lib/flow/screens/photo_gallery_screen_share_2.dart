@@ -5,6 +5,7 @@ import '../../theme/app_colors.dart';
 import '../photobooth_flow_state.dart';
 import '../../network/backend_models.dart';
 import 'package:nexthouse_instant/l10n/app_localizations.dart';
+import '../../widgets/language_selector.dart';
 
 class PhotoGalleryScreenShare2 extends StatefulWidget {
   final PhotoboothFlowState flowState;
@@ -195,6 +196,13 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                       onPressed: flowState.resetToHome,
                     ),
                   ),
+                ),
+
+                // Selettore lingua discreto in alto a destra (a sinistra del pulsante Chiudi)
+                Positioned(
+                  top: 20.0,
+                  right: 80.0,
+                  child: LanguageSelector(flowState: flowState),
                 ),
               ],
             ),
