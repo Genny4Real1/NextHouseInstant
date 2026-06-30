@@ -123,13 +123,13 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // A. QR CODE (Trasparente su sfondo arancione)
+                        // A. QR CODE (Sfondo bianco per facilitare la scansione)
                         Container(
                           width: 416.0,
                           height: 416.0,
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(24.0),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(30.0),
                           ),
                           child: shareUrl.isNotEmpty
@@ -149,7 +149,7 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                                 )
                               : const Center(
                                   child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.nextHouseOrange),
                                   ),
                                 ),
                         ),

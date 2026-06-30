@@ -6,7 +6,7 @@ import 'package:nexthouse_instant/l10n/app_localizations.dart';
 
 void main() {
   testWidgets('ShareTermsScreen renders and triggers callbacks', (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1024, 768);
+    tester.view.physicalSize = const Size(1024, 1200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
       tester.view.resetPhysicalSize();
@@ -37,7 +37,7 @@ void main() {
     // Verify Title and Text are in English
     expect(find.text('Cloud Storage & Privacy'), findsOneWidget);
     expect(
-      find.textContaining('automatically and permanently deleted after 48 hours'),
+      find.textContaining('automatically and permanently deleted upon session expiration'),
       findsOneWidget,
     );
 
