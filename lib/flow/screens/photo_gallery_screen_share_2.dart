@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../theme/app_colors.dart';
@@ -64,29 +65,44 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
             height: 800.0,
             child: Stack(
               children: [
-                // 1. FOTO SCATTATA COME SFONDO (x=34, y=0, width=1212, height=800)
-                Positioned(
-                  left: 34.0,
-                  right: 34.0,
-                  top: 0.0,
-                  bottom: 0.0,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: hasPhoto
-                        ? Image.file(
-                            File(bgImagePath),
-                            fit: BoxFit.cover,
+                // 1. SFONDO SFOCATO PER COPRIRE I BORDI NERI
+                Positioned.fill(
+                  child: hasPhoto
+                      ? Image.file(
+                          File(bgImagePath),
+                          fit: BoxFit.cover,
+                        )
+                      : Container(color: Colors.grey[900]),
+                ),
+                if (hasPhoto)
+                  Positioned.fill(
+                    child: ClipRect(
+                      child: BackdropFilter(
+                        filter: ui.ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                        child: Container(
+                          color: Colors.black.withValues(alpha: 0.2),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // 2. FOTO SCATTATA REALE (NON ZOOMMATA)
+                Positioned.fill(
+                  child: Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: hasPhoto
+                          ? Image.file(
+                              File(bgImagePath),
+                              fit: BoxFit.contain,
                             )
-                        : Container(color: Colors.grey[900]),
+                          : Container(color: Colors.grey[900]),
+                    ),
                   ),
                 ),
 
-                // Overlay scuro sopra la foto per contrasto
-                Positioned(
-                  left: 34.0,
-                  right: 34.0,
-                  top: 0.0,
-                  bottom: 0.0,
+                // Overlay scuro sopra l'intera area di sfondo per contrasto
+                Positioned.fill(
                   child: Container(
                     color: Colors.black.withValues(alpha: 0.35),
                   ),
