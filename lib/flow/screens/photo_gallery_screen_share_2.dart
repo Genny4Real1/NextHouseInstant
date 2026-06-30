@@ -351,7 +351,9 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   ),
-                  onPressed: widget.flowState.shareSelectedPhotos,
+                  onPressed: () => widget.flowState.shareSelectedPhotos(
+                    languageCode: Localizations.localeOf(context).languageCode,
+                  ),
                   child: Row(
                     children: [
                       const Icon(Icons.replay_rounded, size: 18.0),

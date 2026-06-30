@@ -16,7 +16,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get cloudStorageDesc =>
-      'Wenn Sie sich für das Teilen entscheiden, werden Ihre Fotos auf einen sicheren Cloud-Server hochgeladen, damit Sie darauf zugreifen und sie herunterladen können.\n\nUm Ihre Privatsphäre zu schützen, werden alle hochgeladenen Fotos nach 48 Stunden automatisch und dauerhaft gelöscht.';
+      'Wenn Sie sich für das Teilen entscheiden, werden Ihre Fotos auf einen sicheren Cloud-Server hochgeladen, damit Sie darauf zugreifen und sie herunterladen können.\n\nUm Ihre Privatsphäre zu schützen, werden alle hochgeladenen Fotos nach Ablauf der Sitzung (innerhalb von 10 Minuten) automatisch und dauerhaft gelöscht.';
 
   @override
   String get gdprNotice =>

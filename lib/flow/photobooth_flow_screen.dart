@@ -139,7 +139,9 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           selectedImages: _flowState.selectedShareImages,
           onToggleSelection: _flowState.toggleImageSelection,
           onCancel: _flowState.cancelShareSelection,
-          onDone: _flowState.completeShareSelection,
+          onDone: () => _flowState.completeShareSelection(
+            languageCode: Localizations.localeOf(context).languageCode,
+          ),
           isUploading: _flowState.isUploading,
           uploadError: _flowState.uploadError,
           flowState: _flowState,

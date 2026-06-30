@@ -1,7 +1,7 @@
 {
   "takeSelfie": "TAKE A SELFIE",
   "cloudStorageTitle": "Cloud Storage e Privacy",
-  "cloudStorageDesc": "Scegliendo di condividere, le tue foto verranno caricate su un server cloud sicuro in modo da poterle visualizzare e scaricare.\n\nPer garantire la tua privacy, tutte le foto caricate verranno eliminate automaticamente e permanentemente dopo 48 ore.",
+  "cloudStorageDesc": "Scegliendo di condividere, le tue foto verranno caricate su un server cloud sicuro in modo da poterle visualizzare e scaricare.\n\nPer garantire la tua privacy, tutte le foto caricate verranno eliminate automaticamente e permanentemente allo scadere della sessione (entro 10 minuti).",
   "gdprNotice": "Titolare del trattamento: Arp-Hansen Hotel Group.\nContatto: reservations@nexthousecopenhagen.com.\nInquadra il QR code per leggere l'informativa completa.",
   "decline": "Rifiuta",
   "accept": "Accetta",

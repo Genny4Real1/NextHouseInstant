@@ -689,8 +689,8 @@ class PhotoboothFlowState extends ChangeNotifier {
   }
 
   // Condivide le foto caricate tramite upload seriale e creazione sessione
-  Future<void> shareSelectedPhotos() async {
-    debugPrint('PhotoboothFlowState: shareSelectedPhotos started');
+  Future<void> shareSelectedPhotos({String? languageCode}) async {
+    debugPrint('PhotoboothFlowState: shareSelectedPhotos started with languageCode=$languageCode');
     // Evita chiamate parallele
     if (_shareSessionState.status == ShareSessionStatus.uploadingPhotos ||
         _shareSessionState.status == ShareSessionStatus.creatingDownloadSession) {
@@ -813,7 +813,9 @@ class PhotoboothFlowState extends ChangeNotifier {
           ? webappUrl.substring(0, webappUrl.length - 1)
           : webappUrl;
       
-      final String finalDownloadUrl = '$baseUrlNormalized/download/$token';
+      final String finalDownloadUrl = (languageCode != null && languageCode.isNotEmpty)
+          ? '$baseUrlNormalized/download/$token?lang=$languageCode'
+          : '$baseUrlNormalized/download/$token';
 
       _shareSessionState = shareState.copyWith(
         status: ShareSessionStatus.ready,
@@ -901,8 +903,8 @@ class PhotoboothFlowState extends ChangeNotifier {
     togglePhotoSelection(path);
   }
 
-  Future<void> completeShareSelection() async {
-    await shareSelectedPhotos();
+  Future<void> completeShareSelection({String? languageCode}) async {
+    await shareSelectedPhotos(languageCode: languageCode);
   }
 
   void cancelShareSelection() {

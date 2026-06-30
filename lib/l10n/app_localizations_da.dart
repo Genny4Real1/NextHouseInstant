@@ -16,7 +16,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get cloudStorageDesc =>
-      'Ved at vælge at dele vil dine billeder blive uploadet til en sikker cloud-server, så du kan få adgang til og downloade dem.\n\nFor at sikre dit privatliv slettes alle uploadede billeder automatisk og permanent efter 48 timer.';
+      'Ved at vælge at dele vil dine billeder blive uploadet til en sikker cloud-server, så du kan få adgang til og downloade dem.\n\nFor at sikre dit privatliv slettes alle uploadede billeder automatisk og permanent, når sessionen udløber (inden for 10 minutter).';
 
   @override
   String get gdprNotice =>

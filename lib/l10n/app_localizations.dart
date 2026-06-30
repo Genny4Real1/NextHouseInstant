@@ -121,7 +121,7 @@ abstract class AppLocalizations {
   /// No description provided for @cloudStorageDesc.
   ///
   /// In en, this message translates to:
-  /// **'By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted after 48 hours.'**
+  /// **'By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted upon session expiration (within 10 minutes).'**
   String get cloudStorageDesc;
 
   /// No description provided for @gdprNotice.

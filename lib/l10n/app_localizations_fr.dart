@@ -16,7 +16,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get cloudStorageDesc =>
-      'En scegliendo di condividere, vos photos seront téléchargées sur un serveur cloud sécurisé afin que vous puissiez y accéder et les télécharger.\n\nPour garantir votre confidentialité, toutes les photos téléchargées seront automatiquement et définitivement supprimées après 48 heures.';
+      'En choisissant de partager, vos photos seront téléchargées sur un serveur cloud sécurisé afin que vous puissiez y accéder et les télécharger.\n\nPour garantir votre confidentialité, toutes les photos téléchargées seront automatiquement et définitivement supprimées à l\'expiration de la session (sous 10 minutes).';
 
   @override
   String get gdprNotice =>
