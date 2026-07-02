@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
@@ -249,27 +250,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                     ),
                     const SizedBox(height: 20.0),
 
-                    // Ruota di caricamento che gira da Figma (GIF locale)
-                    SizedBox(
-                      width: 220.0,
-                      height: 220.0,
-                      child: Image.asset(
-                        'assets/images/Instant_SpinningWheel.gif',
-                        width: 220.0,
-                        height: 220.0,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 6.0,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                    // Premium custom vector-based loader (prevents freezes & pixelation)
+                    PremiumLoader(animation: _rotationController),
                   ],
                 ),
               ),
@@ -279,5 +261,120 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
       ],
     );
+  }
+}
+
+class PremiumLoader extends StatelessWidget {
+  final Animation<double> animation;
+  final double size;
+
+  const PremiumLoader({
+    super.key,
+    required this.animation,
+    this.size = 180.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        return SizedBox(
+          width: size,
+          height: size,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Outer Track & Sweeping Arc (Orange, clockwise)
+              CustomPaint(
+                size: Size(size, size),
+                painter: ClassicArcPainter(
+                  progress: animation.value,
+                  strokeWidth: 3.5,
+                  trackColor: Colors.white.withValues(alpha: 0.08),
+                  arcColor: AppColors.nextHouseOrange,
+                  isClockwise: true,
+                ),
+              ),
+              
+              // Inner Track & Sweeping Arc (Cyan, counter-clockwise)
+              CustomPaint(
+                size: Size(size * 0.78, size * 0.78),
+                painter: ClassicArcPainter(
+                  progress: animation.value,
+                  strokeWidth: 2.5,
+                  trackColor: Colors.white.withValues(alpha: 0.05),
+                  arcColor: AppColors.primary.withValues(alpha: 0.7),
+                  isClockwise: false,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ClassicArcPainter extends CustomPainter {
+  final double progress;
+  final double strokeWidth;
+  final Color trackColor;
+  final Color arcColor;
+  final bool isClockwise;
+
+  ClassicArcPainter({
+    required this.progress,
+    required this.strokeWidth,
+    required this.trackColor,
+    required this.arcColor,
+    required this.isClockwise,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Rect rect = Offset.zero & size;
+    final Paint trackPaint = Paint()
+      ..color = trackColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    // Draw the full background track circle
+    canvas.drawCircle(rect.center, (size.width - strokeWidth) / 2, trackPaint);
+
+    // Compute animated angle
+    final double rotationAngle = (isClockwise ? progress : -progress) * 2 * math.pi;
+
+    // Gradient Sweep Paint
+    final Paint arcPaint = Paint()
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..shader = SweepGradient(
+        colors: [
+          arcColor.withValues(alpha: 0.0),
+          arcColor,
+        ],
+        stops: const [0.0, 1.0],
+        transform: GradientRotation(rotationAngle - math.pi / 2),
+      ).createShader(rect);
+
+    // Draw a 240-degree sweeping arc (4.18879 radians)
+    canvas.drawArc(
+      rect.deflate(strokeWidth / 2),
+      rotationAngle - 1.57079632679, // rotate starting point with animation
+      4.18879020479, // 240 degrees
+      false,
+      arcPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant ClassicArcPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.arcColor != arcColor ||
+        oldDelegate.isClockwise != isClockwise;
   }
 }

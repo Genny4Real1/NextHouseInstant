@@ -16,7 +16,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get cloudStorageDesc =>
-      'Scegliendo di condividere, le tue foto verranno caricate su un server cloud sicuro in modo da poterle visualizzare e scaricare.\n\nPer garantire la tua privacy, tutte le foto caricate verranno eliminate automaticamente e permanentemente allo scadere della sessione (entro 10 minuti).';
+      'Scegliendo di scaricare, le tue foto verranno caricate su un server cloud sicuro in modo da poterle visualizzare e scaricare.\n\nPer garantire la tua privacy, tutte le foto caricate verranno eliminate automaticamente e permanentemente allo scadere della sessione (entro 10 minuti).';
 
   @override
   String get gdprNotice =>
@@ -44,7 +44,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get edit => 'Modifica';
 
   @override
-  String get share => 'Condividi';
+  String get share => 'Scarica';
+
+  @override
+  String get download => 'Scarica';
 
   @override
   String get delete => 'Elimina';
@@ -53,7 +56,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get processing => 'Elaborazione';
 
   @override
-  String get sharePhotosTitle => 'Condividi le tue foto';
+  String get sharePhotosTitle => 'Scarica le tue foto';
 
   @override
   String get sharePhotosSubtitle =>
@@ -82,7 +85,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Rimani vicino al chiosco mentre completiamo l\'operazione.';
 
   @override
-  String get sharingError => 'Errore di condivisione';
+  String get sharingError => 'Errore di download';
 
   @override
   String get backToSelection => 'Torna alla selezione';

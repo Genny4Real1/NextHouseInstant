@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../theme/app_colors.dart';
 import '../photobooth_flow_state.dart';
 import '../../network/backend_models.dart';
@@ -22,6 +24,114 @@ class PhotoGalleryScreenShare2 extends StatefulWidget {
 
 class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
 
+  Widget _buildPhotoStack(List<String> images) {
+    if (images.isEmpty) {
+      return Container(
+        width: 580.0,
+        height: 435.0,
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          borderRadius: BorderRadius.circular(24.0),
+        ),
+        child: const Icon(
+          Icons.image_not_supported_rounded,
+          color: Colors.white30,
+          size: 64.0,
+        ),
+      );
+    }
+
+    // Mostriamo al massimo le ultime 3 foto per evitare congestione visiva
+    const int maxPhotos = 3;
+    final List<String> displayImages = images.length > maxPhotos
+        ? images.sublist(images.length - maxPhotos)
+        : images;
+
+    return SizedBox(
+      width: 580.0,
+      height: 520.0, // altezza del box contenitore
+      child: Stack(
+        alignment: Alignment.center,
+        children: List.generate(displayImages.length, (index) {
+          final String path = displayImages[index];
+          final bool isTop = index == displayImages.length - 1;
+
+          // Calcoliamo rotazione e offset per creare l'effetto mazzo sfalsato
+          double rotation = 0.0;
+          double offsetX = 0.0;
+          double offsetY = 0.0;
+          double scale = 1.0;
+          double opacity = 1.0;
+
+          if (!isTop) {
+            if (displayImages.length == 3) {
+              if (index == 0) {
+                rotation = -0.06; // ~ -3.5 gradi
+                offsetX = -24.0;
+                offsetY = -12.0;
+                scale = 0.92;
+                opacity = 0.6;
+              } else if (index == 1) {
+                rotation = 0.05; // ~ +3 gradi
+                offsetX = 16.0;
+                offsetY = 12.0;
+                scale = 0.96;
+                opacity = 0.8;
+              }
+            } else if (displayImages.length == 2) {
+              rotation = -0.05;
+              offsetX = -16.0;
+              offsetY = -8.0;
+              scale = 0.95;
+              opacity = 0.75;
+            }
+          }
+
+          return Transform.translate(
+            offset: Offset(offsetX, offsetY),
+            child: Transform.rotate(
+              angle: rotation,
+              child: Transform.scale(
+                scale: scale,
+                child: Opacity(
+                  opacity: opacity,
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      maxWidth: 500.0,
+                    ),
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: isTop ? 0.4 : 0.25),
+                          blurRadius: isTop ? 25.0 : 15.0,
+                          spreadRadius: 1.0,
+                          offset: Offset(0, isTop ? 12.0 : 6.0),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14.0),
+                      child: AspectRatio(
+                        aspectRatio: 4 / 3,
+                        child: Image.file(
+                          File(path),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final flowState = widget.flowState;
@@ -29,10 +139,12 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
     final status = state.status;
     final String shareUrl = state.downloadUrl ?? flowState.shareUrl ?? '';
 
-    // Trova l'immagine di sfondo: l'ultima foto scattata
-    final String? bgImagePath = flowState.capturedImages.isNotEmpty
-        ? flowState.capturedImages.last
-        : null;
+    // Trova l'immagine di sfondo: l'ultima foto selezionata, altrimenti l'ultima foto scattata
+    final String? bgImagePath = flowState.selectedShareImages.isNotEmpty
+        ? flowState.selectedShareImages.last
+        : (flowState.capturedImages.isNotEmpty
+            ? flowState.capturedImages.last
+            : null);
     final bool hasPhoto = bgImagePath != null && bgImagePath.isNotEmpty;
 
     // Gestione stati caricamento/fallimento
@@ -86,21 +198,6 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                     ),
                   ),
 
-                // 2. FOTO SCATTATA REALE (NON ZOOMMATA)
-                Positioned.fill(
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16.0),
-                      child: hasPhoto
-                          ? Image.file(
-                              File(bgImagePath),
-                              fit: BoxFit.contain,
-                            )
-                          : Container(color: Colors.grey[900]),
-                    ),
-                  ),
-                ),
-
                 // Overlay scuro sopra l'intera area di sfondo per contrasto
                 Positioned.fill(
                   child: Container(
@@ -108,84 +205,231 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                   ),
                 ),
 
-                // 2. CARD ARANCIONE DI CONDIVISIONE (Al centro, larghezza 598, altezza 610)
-                Center(
-                  child: Container(
-                    width: 598.0,
-                    height: 610.0,
-                    padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 30.0),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          AppColors.nextHouseOrange,
-                          Color(0xFFC74C13),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                // 2. LOGO DI BRANDING IN ALTO A SINISTRA
+                Positioned(
+                  top: 30.0,
+                  left: 50.0,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/nexthouse_logo_star.svg',
+                        height: 40.0,
+                        fit: BoxFit.contain,
                       ),
-                      borderRadius: BorderRadius.circular(60.0),
-                      border: Border.all(
-                        color: Colors.white.withAlpha(25),
-                        width: 1.5,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black54,
-                          blurRadius: 30.0,
-                          offset: Offset(0, 15),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // A. QR CODE (Sfondo bianco per facilitare la scansione)
-                        Container(
-                          width: 416.0,
-                          height: 416.0,
-                          padding: const EdgeInsets.all(24.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30.0),
+                      const SizedBox(width: 12.0),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            'Next House',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                            ),
                           ),
-                          child: shareUrl.isNotEmpty
-                              ? QrImageView(
-                                  data: shareUrl,
-                                  version: QrVersions.auto,
-                                  gapless: false,
-                                  eyeStyle: const QrEyeStyle(
-                                    eyeShape: QrEyeShape.square,
-                                    color: Colors.black,
-                                  ),
-                                  dataModuleStyle: const QrDataModuleStyle(
-                                    dataModuleShape: QrDataModuleShape.square,
-                                    color: Colors.black,
-                                  ),
-                                  backgroundColor: Colors.transparent,
-                                )
-                              : const Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.nextHouseOrange),
-                                  ),
-                                ),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            'INSTANT',
+                            style: const TextStyle(
+                              fontFamily: 'Saira Stencil One',
+                              color: AppColors.nextHouseOrange,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 3. CONTENUTO PRINCIPALE IN LAYOUT BILANCIATO (SPLIT-SCREEN)
+                Positioned(
+                  left: 60.0,
+                  right: 60.0,
+                  top: 100.0,
+                  bottom: 50.0,
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Colonna Sinistra: Cornice della Foto Scattata
+                        Expanded(
+                          flex: 6,
+                          child: Center(
+                            child: _buildPhotoStack(flowState.selectedShareImages.toList()),
+                          ),
                         ),
 
-                        // B. BOX "Scan me!"
-                        Container(
-                          width: 250.0,
-                          height: 58.0,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(29.0),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)!.scanMe,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.nextHouseOrange,
+                        const SizedBox(width: 48.0),
+
+                        // Colonna Destra: Card di Condivisione Glassmorphic
+                        Expanded(
+                          flex: 5,
+                          child: Center(
+                            child: Container(
+                              width: 440.0,
+                              padding: const EdgeInsets.all(32.0),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface.withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(36.0),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.45),
+                                    blurRadius: 25.0,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // Icona QR Code Superiore
+                                  Container(
+                                    padding: const EdgeInsets.all(12.0),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.nextHouseOrange.withValues(alpha: 0.15),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.qr_code_scanner_rounded,
+                                      color: AppColors.nextHouseOrange,
+                                      size: 32.0,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16.0),
+
+                                  // Titolo
+                                  Text(
+                                    AppLocalizations.of(context)!.sharePhotosTitle,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: -0.5,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 8.0),
+
+                                  // Sottotitolo
+                                  Text(
+                                    AppLocalizations.of(context)!.sharePhotosSubtitle,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14.0,
+                                      color: AppColors.textSecondary,
+                                      height: 1.3,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 24.0),
+
+                                  // Card bianca unificata QR Code + Badge Scan me!
+                                  Container(
+                                    padding: const EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(24.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.15),
+                                          blurRadius: 15.0,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // QR CODE
+                                        SizedBox(
+                                          width: 190.0,
+                                          height: 190.0,
+                                          child: shareUrl.isNotEmpty
+                                              ? QrImageView(
+                                                  data: shareUrl,
+                                                  version: QrVersions.auto,
+                                                  gapless: false,
+                                                  eyeStyle: const QrEyeStyle(
+                                                    eyeShape: QrEyeShape.circle,
+                                                    color: Colors.black,
+                                                  ),
+                                                  dataModuleStyle: const QrDataModuleStyle(
+                                                    dataModuleShape: QrDataModuleShape.circle,
+                                                    color: Colors.black,
+                                                  ),
+                                                  backgroundColor: Colors.transparent,
+                                                )
+                                              : const Center(
+                                                  child: CircularProgressIndicator(
+                                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                                      AppColors.nextHouseOrange,
+                                                    ),
+                                                  ),
+                                                ),
+                                        ),
+                                        const SizedBox(height: 12.0),
+
+                                        // Badge "SCAN ME!" integrato
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20.0,
+                                            vertical: 8.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                AppColors.nextHouseOrange,
+                                                Color(0xFFC74C13),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            borderRadius: BorderRadius.circular(12.0),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: AppColors.nextHouseOrange.withValues(alpha: 0.3),
+                                                blurRadius: 8.0,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Text(
+                                            AppLocalizations.of(context)!.scanMe.toUpperCase(),
+                                            style: GoogleFonts.inter(
+                                              fontSize: 13.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              letterSpacing: 1.2,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24.0),
+
+                                  // Messaggio informativo di prossimità
+                                  Text(
+                                    AppLocalizations.of(context)!.stayCloseMsg,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12.0,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

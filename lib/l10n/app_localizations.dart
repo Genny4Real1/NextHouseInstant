@@ -121,7 +121,7 @@ abstract class AppLocalizations {
   /// No description provided for @cloudStorageDesc.
   ///
   /// In en, this message translates to:
-  /// **'By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted upon session expiration (within 10 minutes).'**
+  /// **'By choosing to download, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted upon session expiration (within 10 minutes).'**
   String get cloudStorageDesc;
 
   /// No description provided for @gdprNotice.
@@ -175,8 +175,14 @@ abstract class AppLocalizations {
   /// No description provided for @share.
   ///
   /// In en, this message translates to:
-  /// **'Share'**
+  /// **'Download'**
   String get share;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
 
   /// No description provided for @delete.
   ///
@@ -193,7 +199,7 @@ abstract class AppLocalizations {
   /// No description provided for @sharePhotosTitle.
   ///
   /// In en, this message translates to:
-  /// **'Share your photos'**
+  /// **'Download your photos'**
   String get sharePhotosTitle;
 
   /// No description provided for @sharePhotosSubtitle.
@@ -247,7 +253,7 @@ abstract class AppLocalizations {
   /// No description provided for @sharingError.
   ///
   /// In en, this message translates to:
-  /// **'Sharing Error'**
+  /// **'Download Error'**
   String get sharingError;
 
   /// No description provided for @backToSelection.

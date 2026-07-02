@@ -16,7 +16,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cloudStorageDesc =>
-      'By choosing to share, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted upon session expiration (within 10 minutes).';
+      'By choosing to download, your photos will be uploaded to a secure cloud server so you can access and download them.\n\nTo ensure your privacy, all uploaded photos will be automatically and permanently deleted upon session expiration (within 10 minutes).';
 
   @override
   String get gdprNotice =>
@@ -44,7 +44,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit => 'Edit';
 
   @override
-  String get share => 'Share';
+  String get share => 'Download';
+
+  @override
+  String get download => 'Download';
 
   @override
   String get delete => 'Delete';
@@ -53,7 +56,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get processing => 'Processing';
 
   @override
-  String get sharePhotosTitle => 'Share your photos';
+  String get sharePhotosTitle => 'Download your photos';
 
   @override
   String get sharePhotosSubtitle => 'Select the images you want to save';
@@ -81,7 +84,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Stay close to the kiosk while we complete the operation.';
 
   @override
-  String get sharingError => 'Sharing Error';
+  String get sharingError => 'Download Error';
 
   @override
   String get backToSelection => 'Back to selection';

@@ -233,8 +233,8 @@ class _ResultScreenState extends State<ResultScreen> {
                                 onPressed: widget.onEdit,
                               ),
                               _buildActiveToolbarButton(
-                                icon: Icons.share_rounded,
-                                label: AppLocalizations.of(context)!.share,
+                                icon: Icons.download_rounded,
+                                label: AppLocalizations.of(context)!.download,
                                 onPressed: widget.onShare,
                               ),
                               _buildActiveToolbarButton(

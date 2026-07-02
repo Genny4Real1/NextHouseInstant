@@ -16,7 +16,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get cloudStorageDesc =>
-      'Ved at vælge at dele vil dine billeder blive uploadet til en sikker cloud-server, så du kan få adgang til og downloade dem.\n\nFor at sikre dit privatliv slettes alle uploadede billeder automatisk og permanent, når sessionen udløber (inden for 10 minutter).';
+      'Ved at vælge at downloade vil dine billeder blive uploadet til en sikker cloud-server, så du kan få adgang til og downloade dem.\n\nFor at sikre dit privatliv slettes alle uploadede billeder automatisk og permanent, når sessionen udløber (inden for 10 minutter).';
 
   @override
   String get gdprNotice =>
@@ -44,7 +44,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get edit => 'Rediger';
 
   @override
-  String get share => 'Del';
+  String get share => 'Download';
+
+  @override
+  String get download => 'Download';
 
   @override
   String get delete => 'Slet';
@@ -53,7 +56,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get processing => 'Behandler';
 
   @override
-  String get sharePhotosTitle => 'Del dine billeder';
+  String get sharePhotosTitle => 'Download dine billeder';
 
   @override
   String get sharePhotosSubtitle => 'Vælg de billeder, du vil gemme';
@@ -81,7 +84,7 @@ class AppLocalizationsDa extends AppLocalizations {
       'Bliv tæt på kiosken, mens vi fuldfører handlingen.';
 
   @override
-  String get sharingError => 'Fejl ved deling';
+  String get sharingError => 'Fejl ved download';
 
   @override
   String get backToSelection => 'Tilbage til valg';

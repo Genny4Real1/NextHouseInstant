@@ -236,7 +236,7 @@ class PhotoSelectionShareScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            AppLocalizations.of(context)!.share,
+                            AppLocalizations.of(context)!.download,
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 18.0,
