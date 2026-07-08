@@ -15,6 +15,7 @@ class ResultScreen extends StatefulWidget {
   final VoidCallback onDelete;
   final VoidCallback onShare;
   final VoidCallback onEdit;
+  final VoidCallback onTakeAnother;
   final bool showDoneToolbar;
   final List<String> capturedImages;
   final int currentGalleryIndex;
@@ -30,6 +31,7 @@ class ResultScreen extends StatefulWidget {
     required this.onDelete,
     required this.onShare,
     required this.onEdit,
+    required this.onTakeAnother,
     required this.showDoneToolbar,
     required this.capturedImages,
     required this.currentGalleryIndex,
@@ -221,12 +223,17 @@ class _ResultScreenState extends State<ResultScreen> {
                         )
                       : Container(
                           key: const ValueKey('toolbar_view'),
-                          width: 500.0,
+                          width: 620.0,
                           height: 140.0,
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
+                              _buildActiveToolbarButton(
+                                icon: Icons.add_a_photo_rounded,
+                                label: AppLocalizations.of(context)!.takeAnother,
+                                onPressed: widget.onTakeAnother,
+                              ),
                               _buildActiveToolbarButton(
                                 icon: Icons.edit_rounded,
                                 label: AppLocalizations.of(context)!.edit,

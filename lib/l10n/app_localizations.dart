@@ -148,6 +148,12 @@ abstract class AppLocalizations {
   /// **'Do you want to take another picture?'**
   String get takeAnotherQuestion;
 
+  /// No description provided for @takeAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Take another'**
+  String get takeAnother;
+
   /// No description provided for @yes.
   ///
   /// In en, this message translates to:

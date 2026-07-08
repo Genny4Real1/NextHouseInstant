@@ -32,6 +32,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get takeAnotherQuestion => 'Vil du tage et billede mere?';
 
   @override
+  String get takeAnother => 'Tag et mere';
+
+  @override
   String get yes => 'Ja';
 
   @override

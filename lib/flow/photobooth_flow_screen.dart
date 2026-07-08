@@ -6,7 +6,6 @@ import 'screens/idle_screen.dart';
 import 'screens/countdown_screen.dart';
 import 'screens/capture_screen.dart';
 import 'screens/processing_screen.dart';
-import 'screens/ask_another_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/edit_screen.dart';
 import 'screens/share_terms_screen.dart';
@@ -81,14 +80,6 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           activeFilter: _flowState.activeFilter,
           flowState: _flowState,
         );
-      case PhotoboothState.askAnother:
-        return AskAnotherScreen(
-          key: const ValueKey('askAnother'),
-          capturedImagePath: _flowState.capturedImagePath,
-          onYes: _flowState.takeAnotherPhoto,
-          onNo: _flowState.showGallery,
-          flowState: _flowState,
-        );
       case PhotoboothState.result:
         return ResultScreen(
           key: const ValueKey('result'),
@@ -97,6 +88,7 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
           onDelete: _flowState.deletePhotos,
           onShare: _flowState.startShareFlow,
           onEdit: _flowState.enterEditMode,
+          onTakeAnother: _flowState.takeAnotherPhoto,
           showDoneToolbar: _flowState.showDoneToolbar,
           capturedImages: _flowState.capturedImages,
           currentGalleryIndex: _flowState.currentGalleryIndex,

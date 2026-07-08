@@ -32,6 +32,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get takeAnotherQuestion => 'Voulez-vous prendre une autre photo?';
 
   @override
+  String get takeAnother => 'Autre photo';
+
+  @override
   String get yes => 'Oui';
 
   @override

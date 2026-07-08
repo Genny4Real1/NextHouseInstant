@@ -14,7 +14,6 @@ enum PhotoboothState {
   countdown, // Schermata camera (anteprima e countdown)
   captureFeedback,
   processing,
-  askAnother,
   result,
   edit,
   shareTerms,
@@ -283,7 +282,7 @@ class PhotoboothFlowState extends ChangeNotifier {
     final delay = remaining.isNegative ? Duration.zero : remaining;
 
     _autoResetTimer = Timer(delay, () {
-      _askAnother();
+      showGallery();
     });
   }
 
@@ -368,11 +367,7 @@ class PhotoboothFlowState extends ChangeNotifier {
     }
   }
 
-  void _askAnother() {
-    _cancelTimers();
-    _state = PhotoboothState.askAnother;
-    notifyListeners();
-  }
+
 
   // Avvia lo scatto di un'altra foto: torna in anteprima per far cambiare filtri
   void takeAnotherPhoto() {
