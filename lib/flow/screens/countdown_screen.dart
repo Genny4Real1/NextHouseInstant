@@ -5,7 +5,6 @@ import '../photobooth_flow_state.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/camera_placeholder.dart';
 import 'package:nexthouse_instant/l10n/app_localizations.dart';
-import '../../widgets/language_selector.dart';
 
 class CountdownScreen extends StatefulWidget {
   final PhotoboothFlowState flowState;
@@ -109,7 +108,7 @@ class _CountdownScreenState extends State<CountdownScreen> {
                   ),
                 ),
 
-                // 2B. PULSANTE INDIETRO E SELETTORE LINGUA (sovrapposti se non in countdown)
+                // 2B. PULSANTE INDIETRO (sovrapposto se non in countdown)
                 if (!isCountingDown) ...[
                   Positioned(
                     left: 48.0,
@@ -145,11 +144,6 @@ class _CountdownScreenState extends State<CountdownScreen> {
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    right: 48.0,
-                    top: 24.0,
-                    child: LanguageSelector(flowState: state),
                   ),
                 ],
 

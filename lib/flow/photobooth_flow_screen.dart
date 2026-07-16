@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'photobooth_flow_state.dart';
 import '../services/kiosk_service.dart';
@@ -31,9 +32,13 @@ class _PhotoboothFlowScreenState extends State<PhotoboothFlowScreen> {
   void initState() {
     super.initState();
 
-    // Avvia la modalità Kiosk protetta su Android al completamento del layout
+    // Avvia la modalità Kiosk protetta su Android al completamento del layout (bypass in modalità Debug per evitare disconnessioni di ADB)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      KioskService.startKioskMode();
+      if (!kDebugMode) {
+        KioskService.startKioskMode();
+      } else {
+        debugPrint('Kiosk mode bypassed in debug mode to allow USB debugging.');
+      }
     });
   }
 

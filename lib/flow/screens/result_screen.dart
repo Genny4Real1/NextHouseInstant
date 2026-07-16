@@ -244,11 +244,12 @@ class _ResultScreenState extends State<ResultScreen> {
                                 label: AppLocalizations.of(context)!.download,
                                 onPressed: widget.onShare,
                               ),
-                              _buildActiveToolbarButton(
-                                icon: Icons.delete_rounded,
-                                label: AppLocalizations.of(context)!.delete,
-                                onPressed: widget.onDelete,
-                              ),
+                              if (widget.capturedImages.length > 1)
+                                _buildActiveToolbarButton(
+                                  icon: Icons.delete_rounded,
+                                  label: AppLocalizations.of(context)!.delete,
+                                  onPressed: widget.onDelete,
+                                ),
                             ],
                           ),
                         ),

@@ -92,7 +92,16 @@ class _IdleScreenState extends State<IdleScreen> {
 
                   // Pulsante "TAKE A SELFIE" con angoli asimmetrici
                   GestureDetector(
-                    onTap: widget.onStart,
+                    onTap: () {
+                      if (_isInitialized) {
+                        try {
+                          _controller.pause();
+                        } catch (e) {
+                          debugPrint('Error pausing background video: $e');
+                        }
+                      }
+                      widget.onStart();
+                    },
                     child: Container(
                       width: 694.0,
                       height: 171.0,
