@@ -210,38 +210,27 @@ class _PhotoGalleryScreenShare2State extends State<PhotoGalleryScreenShare2> {
                   top: 30.0,
                   left: 50.0,
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
-                      SvgPicture.asset(
-                        'assets/images/nexthouse_logo_star.svg',
-                        height: 40.0,
-                        fit: BoxFit.contain,
+                      Text(
+                        'Next House',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
                       ),
-                      const SizedBox(width: 12.0),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            'Next House',
-                            style: GoogleFonts.inter(
-                              color: Colors.white,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(width: 8.0),
-                          Text(
-                            'INSTANT',
-                            style: const TextStyle(
-                              fontFamily: 'Saira Stencil One',
-                              color: AppColors.nextHouseOrange,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(width: 8.0),
+                      Text(
+                        'INSTANT',
+                        style: const TextStyle(
+                          fontFamily: 'Saira Stencil One',
+                          color: AppColors.nextHouseOrange,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ],
                   ),

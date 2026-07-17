@@ -219,32 +219,9 @@ class _CountdownScreenState extends State<CountdownScreen> {
                         });
                         state.startCountdown();
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.nextHouseOrange,
-                            width: 10.0,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black54,
-                              blurRadius: 15.0,
-                              offset: Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Container(
-                            width: 84.0,
-                            height: 84.0,
-                            decoration: const BoxDecoration(
-                              color: AppColors.nextHouseOrange,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
+                      child: Image.asset(
+                        'assets/images/new record button.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

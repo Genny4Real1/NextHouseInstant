@@ -238,17 +238,6 @@ class NexthouseInstantLogo extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Stella arancione sullo sfondo
-          Positioned(
-            top: 12.0, // 2.45% di 510
-            bottom: 49.0, // 9.55% di 510
-            left: 122.0, // Posizionamento combinato per centrare la stella
-            right: 122.0,
-            child: SvgPicture.asset(
-              'assets/images/nexthouse_logo_star.svg',
-              fit: BoxFit.contain,
-            ),
-          ),
           // Scritta corsiva nera "Next House"
           Positioned(
             top: 121.0, // 23.7% di 510
