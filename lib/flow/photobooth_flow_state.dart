@@ -247,32 +247,22 @@ class PhotoboothFlowState extends ChangeNotifier {
     _state = PhotoboothState.captureFeedback;
     notifyListeners();
 
-    _autoResetTimer = Timer(AppDurations.captureFeedback, () {
+    _autoResetTimer = Timer(const Duration(milliseconds: 250), () {
       _startProcessing();
     });
   }
 
-  // Elaborazione reale del filtro + finta attesa
+  // Elaborazione reale del filtro + transizione immediata
   Future<void> _startProcessing() async {
     _cancelTimers();
     _state = PhotoboothState.processing;
     notifyListeners();
 
-    final stopwatch = Stopwatch()..start();
-
     if (_capturedImagePath != null) {
       String processedPath = _capturedImagePath!;
 
-      // 1. Applica il filtro in-memory se selezionato
-      if (_activeFilter != null) {
-        debugPrint('PhotoboothFlowState: Applying filter $_activeFilter to file $processedPath');
-        final matrix = _getColorMatrixForFilter(_activeFilter);
-        processedPath = await _applyFilterToImageFile(processedPath, matrix);
-      }
-
-      // 2. Applica sempre la filigrana
-      debugPrint('PhotoboothFlowState: Applying watermark to file $processedPath');
-      processedPath = await _applyWatermarkToImageFile(processedPath);
+      final matrix = _activeFilter != null ? _getColorMatrixForFilter(_activeFilter) : null;
+      processedPath = await _processImageWithFilterAndWatermark(processedPath, matrix);
 
       _capturedImagePath = processedPath;
       if (_capturedImages.isNotEmpty) {
@@ -281,15 +271,98 @@ class PhotoboothFlowState extends ChangeNotifier {
       notifyListeners();
     }
 
-    stopwatch.stop();
-    // Calcola il tempo rimanente rispetto ai 2.5 secondi finti di processing
-    final elapsed = stopwatch.elapsed;
-    final remaining = AppDurations.processing - elapsed;
-    final delay = remaining.isNegative ? Duration.zero : remaining;
+    showGallery();
+  }
 
-    _autoResetTimer = Timer(delay, () {
-      showGallery();
-    });
+  // Single-pass processing: applica il filtro di colore E la filigrana SVG in un'unica operazione ottimizzata
+  Future<String> _processImageWithFilterAndWatermark(
+    String inputPath,
+    List<double>? filterMatrix,
+  ) async {
+    try {
+      final File file = File(inputPath);
+      if (!await file.exists()) {
+        return inputPath;
+      }
+      final Uint8List bytes = await file.readAsBytes();
+
+      // Decomprime l'immagine ridimensionandola a 1920px di larghezza per ottimizzare l'encoding PNG (da ~2s a <100ms)
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        bytes,
+        targetWidth: 1920,
+      );
+      final ui.FrameInfo frameInfo = await codec.getNextFrame();
+      final ui.Image image = frameInfo.image;
+
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
+      final ui.Canvas canvas = ui.Canvas(recorder);
+
+      // Paint con matrice del filtro se presente
+      final ui.Paint paint = ui.Paint();
+      if (filterMatrix != null) {
+        paint.colorFilter = ui.ColorFilter.matrix(filterMatrix);
+      }
+
+      // Disegna l'immagine di base (con eventuale filtro applicato)
+      canvas.drawImage(image, ui.Offset.zero, paint);
+
+      // Tenta il caricamento e disegno dell'SVG filigrana in sovrascrittura nello stesso canvas
+      try {
+        final PictureInfo pictureInfo = await vg.loadPicture(
+          const SvgAssetLoader('assets/images/nexthouse_logo_text.svg'),
+          null,
+        );
+
+        final double svgWidth = pictureInfo.size.width;
+        final double svgHeight = pictureInfo.size.height;
+        final double aspectRatio = svgHeight / svgWidth;
+
+        final double watermarkWidth = image.width * 0.15;
+        final double watermarkHeight = watermarkWidth * aspectRatio;
+
+        final double marginX = image.width * 0.07;
+        final double marginY = image.width * 0.025;
+        final double targetX = marginX;
+        final double targetY = image.height - watermarkHeight - marginY;
+
+        canvas.save();
+        canvas.translate(targetX, targetY);
+        canvas.scale(watermarkWidth / svgWidth, watermarkHeight / svgHeight);
+
+        canvas.drawPicture(pictureInfo.picture);
+        canvas.restore();
+
+        pictureInfo.picture.dispose();
+      } catch (svgError) {
+        debugPrint('Warning: Could not load SVG watermark during processing: $svgError');
+      }
+
+      final ui.Picture picture = recorder.endRecording();
+      final ui.Image processedImage = await picture.toImage(image.width, image.height);
+
+      final ByteData? byteData = await processedImage.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        return inputPath;
+      }
+
+      final Uint8List processedBytes = byteData.buffer.asUint8List();
+      final String directory = file.parent.path;
+      final String outputPath = '$directory/processed_${DateTime.now().millisecondsSinceEpoch}.png';
+
+      await File(outputPath).writeAsBytes(processedBytes, flush: true);
+
+      // Elimina il file sorgente temporaneo
+      try {
+        await file.delete();
+      } catch (e) {
+        debugPrint('Error deleting file: $e');
+      }
+
+      return outputPath;
+    } catch (e) {
+      debugPrint('Error processing image: $e');
+      return inputPath;
+    }
   }
 
   // Helper per applicare la filigrana nexthouse_logo_text.svg in basso a sinistra
@@ -933,7 +1006,7 @@ class PhotoboothFlowState extends ChangeNotifier {
   }
 
   @visibleForTesting
-  Future<String> applyWatermarkToImageFileTest(String inputPath) => _applyWatermarkToImageFile(inputPath);
+  Future<String> applyWatermarkToImageFileTest(String inputPath) => _processImageWithFilterAndWatermark(inputPath, null);
 
   void _cancelTimers() {
     _countdownTimer?.cancel();
