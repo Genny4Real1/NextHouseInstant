@@ -218,12 +218,13 @@ class PhotoboothFlowState extends ChangeNotifier {
     notifyListeners();
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdownValue > 1) {
+      if (_countdownValue > 0) {
         _countdownValue--;
         notifyListeners();
-      } else {
-        timer.cancel();
-        _triggerCapture();
+        if (_countdownValue == 0) {
+          timer.cancel();
+          _triggerCapture();
+        }
       }
     });
   }
@@ -232,19 +233,19 @@ class PhotoboothFlowState extends ChangeNotifier {
   Future<void> _triggerCapture() async {
     _cancelTimers();
     _isCountingDown = false;
-    _state = PhotoboothState.captureFeedback;
-    notifyListeners();
 
     if (_isCameraInitialized && _cameraController != null) {
       try {
         final XFile file = await _cameraController!.takePicture();
         _capturedImagePath = file.path;
         _capturedImages.add(file.path);
-        notifyListeners();
       } catch (e) {
         debugPrint('Error during capture: $e');
       }
     }
+
+    _state = PhotoboothState.captureFeedback;
+    notifyListeners();
 
     _autoResetTimer = Timer(AppDurations.captureFeedback, () {
       _startProcessing();

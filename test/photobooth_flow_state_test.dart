@@ -70,5 +70,26 @@ void main() {
       flowState.resetToHome();
       expect(flowState.localeCode, 'en');
     });
+
+    test('startCountdown should decrement down to 0 and trigger capture at 0', () async {
+      final flowState = PhotoboothFlowState();
+      flowState.startFlow();
+      expect(flowState.state, PhotoboothState.countdown);
+
+      flowState.startCountdown();
+      expect(flowState.isCountingDown, isTrue);
+      expect(flowState.countdownValue, 5);
+
+      // Advance time by 5 seconds (1 second per tick)
+      for (int i = 4; i >= 0; i--) {
+        await Future.delayed(const Duration(seconds: 1));
+        expect(flowState.countdownValue, i);
+      }
+
+      // After countdown reaches 0, capture is triggered and state changes to captureFeedback
+      expect(flowState.countdownValue, 0);
+      expect(flowState.state, PhotoboothState.captureFeedback);
+      expect(flowState.isCountingDown, isFalse);
+    });
   });
 }
