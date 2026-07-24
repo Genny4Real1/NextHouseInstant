@@ -234,18 +234,20 @@ class PhotoboothFlowState extends ChangeNotifier {
     _cancelTimers();
     _isCountingDown = false;
 
+    // Cambia immediatamente lo stato allo scadere del countdown per attivare subito il Flash visivo
+    _state = PhotoboothState.captureFeedback;
+    notifyListeners();
+
     if (_isCameraInitialized && _cameraController != null) {
       try {
         final XFile file = await _cameraController!.takePicture();
         _capturedImagePath = file.path;
         _capturedImages.add(file.path);
+        notifyListeners();
       } catch (e) {
         debugPrint('Error during capture: $e');
       }
     }
-
-    _state = PhotoboothState.captureFeedback;
-    notifyListeners();
 
     _autoResetTimer = Timer(const Duration(milliseconds: 250), () {
       _startProcessing();
